@@ -84,6 +84,14 @@ export default {
           image: "certificate-goggle.jpg",
           link: "https://www.linkedin.com/in/muhamadfrhn/overlay/1707044972474/single-media-viewer/?profileId=ACoAADyMc3QBvQYQUejUksrPqiuriwOkni0VIB4",
           description: "Completed the 'Google Analytics for Beginners' course from Google Analytics Academy and obtained a certificate of completion."
+        },
+        {
+          id: 6,
+          name: "Cisco Networking Academy",
+          issuedDate: "2023-08-16",
+          image: "certificate-cisco.jpg",
+          link: "https://www.credly.com/badges/09507c11-1b98-4690-982d-9e4c034601ce",
+          description: "Successfully achieved level credential for completing the Data Analytics Essentials course."
         }
       ]
     }
