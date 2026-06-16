@@ -67,25 +67,34 @@ export function AdminSidebar() {
       </aside>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border">
-        <div className="flex justify-around py-2">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border pb-safe">
+        <div className="flex justify-around items-center py-3">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-xs transition-colors ${
+                className={`relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 ${
                   isActive
-                    ? "text-primary"
-                    : "text-muted-foreground"
+                    ? "text-primary bg-primary/15"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
                 <item.icon className="w-5 h-5" />
-                <span className="truncate max-w-[60px]">{item.label}</span>
+                {isActive && <div className="absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary" />}
               </Link>
             );
           })}
+          {/* Logout Button */}
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="relative flex items-center justify-center w-10 h-10 rounded-xl text-destructive hover:bg-destructive/10 transition-all duration-200"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          </form>
         </div>
       </nav>
     </>
