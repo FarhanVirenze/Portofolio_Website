@@ -11,7 +11,7 @@ import { Home, User, Briefcase, Award } from "lucide-react";
 const navLinks = [
   { name: "Home", path: "/", icon: Home },
   { name: "About", path: "/about", icon: User },
-  { name: "Portfolio", path: "/portofolio", icon: Briefcase },
+  { name: "Portofolio", path: "/portofolio", icon: Briefcase },
   { name: "Certification", path: "/certification", icon: Award },
 ];
 
