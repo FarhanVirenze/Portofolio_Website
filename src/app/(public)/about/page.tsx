@@ -98,7 +98,7 @@ export default async function About() {
                 {/* Name at bottom */}
                 <div className="absolute bottom-0 left-0 right-0 p-8">
                   <h2 className="text-3xl font-bold text-foreground">Muhamad Farhan</h2>
-                  <p className="text-primary font-medium text-lg mt-1">Informatics Student</p>
+                  <p className="text-primary font-medium text-lg mt-1">Software Engineer</p>
                 </div>
               </div>
             </div>
@@ -111,11 +111,6 @@ export default async function About() {
                 key={idx} 
                 className="h-full rounded-3xl border border-border bg-card p-8 shadow-sm hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 transition-all duration-500 hover:-translate-y-1"
               >
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-sm font-bold">
-                    {String(idx + 1).padStart(2, '0')}
-                  </span>
-                </div>
                 <p className="text-muted-foreground leading-relaxed text-base md:text-xl text-justify indent-14">
                   {paragraph}
                 </p>
@@ -126,82 +121,50 @@ export default async function About() {
       </section>
 
       {/* Skills Section */}
-      <section>
+      <section className="overflow-hidden">
         <div className="flex items-center gap-4 mb-10">
           <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
             <Code className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold text-foreground">Skills & Tools</h2>
+            <h2 className="text-3xl font-bold text-foreground">Tech Stack & Tools</h2>
             <p className="text-sm text-muted-foreground">Technologies I work with</p>
           </div>
         </div>
 
-        <Tabs defaultValue="tech" className="w-full">
-          <TabsList className="mb-8 bg-muted/50 backdrop-blur-sm border border-border/50 rounded-full p-1">
-            <TabsTrigger 
-              value="tech" 
-              className="rounded-full px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 transition-all"
-            >
-              <Code className="w-4 h-4 mr-2" />
-              Tech Stack
-            </TabsTrigger>
-            <TabsTrigger 
-              value="tool" 
-              className="rounded-full px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 transition-all"
-            >
-              <Wrench className="w-4 h-4 mr-2" />
-              Tools
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="tech" className="mt-0">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {techSkills.map((skill, index) => (
-                <SkillCard key={skill.id} skill={skill} index={index} />
-              ))}
-            </div>
-          </TabsContent>
+        {/* Marquee Container */}
+        <div className="relative flex flex-col gap-10 w-full max-w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent_0,black_100px,black_calc(100%-100px),transparent_100%)] py-8">
           
-          <TabsContent value="tool" className="mt-0">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {toolSkills.map((skill, index) => (
-                <SkillCard key={skill.id} skill={skill} index={index} />
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </section>
-    </div>
-  );
-}
+          {/* Row 1: Tech Stack */}
+          <div className="flex w-max animate-marquee hover:[animation-play-state:paused] items-center">
+            {[...techSkills, ...techSkills, ...techSkills, ...techSkills].map((skill, index) => (
+              <div key={`tech-${index}`} className="flex items-center justify-center px-8 md:px-12 group cursor-pointer">
+                <img 
+                  src={skill.icon_url || "/favicon.ico"} 
+                  alt={skill.name} 
+                  title={skill.name}
+                  className="w-12 h-12 md:w-16 md:h-16 object-contain grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-125 transition-all duration-300 drop-shadow-md group-hover:drop-shadow-xl" 
+                />
+              </div>
+            ))}
+          </div>
 
-function SkillCard({ skill, index }: { skill: Skill; index: number }) {
-  return (
-    <div 
-      className="group relative flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-card/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30 cursor-default overflow-hidden"
-      style={{ animationDelay: `${index * 50}ms` }}
-    >
-      {/* Background glow on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      
-      <div className="relative w-11 h-11 flex items-center justify-center shrink-0 rounded-lg bg-muted/50 border border-border/50 group-hover:border-primary/20 transition-colors">
-        <img 
-          src={skill.icon_url || "/favicon.ico"} 
-          alt={skill.name} 
-          width={28} 
-          height={28} 
-          className="object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-sm"
-        />
-      </div>
-      <div className="relative flex flex-col min-w-0">
-        <span className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm truncate">
-          {skill.name}
-        </span>
-        <span className="text-xs text-muted-foreground truncate">
-          {skill.level}
-        </span>
-      </div>
+          {/* Row 2: Tools (Reverse) */}
+          <div className="flex w-max animate-marquee-reverse hover:[animation-play-state:paused] items-center">
+            {[...toolSkills, ...toolSkills, ...toolSkills, ...toolSkills].map((skill, index) => (
+              <div key={`tool-${index}`} className="flex items-center justify-center px-8 md:px-12 group cursor-pointer">
+                <img 
+                  src={skill.icon_url || "/favicon.ico"} 
+                  alt={skill.name} 
+                  title={skill.name}
+                  className="w-12 h-12 md:w-16 md:h-16 object-contain grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-125 transition-all duration-300 drop-shadow-md group-hover:drop-shadow-xl" 
+                />
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
     </div>
   );
 }

@@ -87,29 +87,42 @@ export function Navbar() {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/50 pb-safe">
-        <ul className="flex items-center justify-around px-2 py-2">
+      <nav className="md:hidden fixed bottom-1 left-4 right-4 z-50">
+        <div className="bg-background/50 backdrop-blur-xl rounded-full shadow-2xl shadow-primary/10 px-2 flex items-center justify-around relative border border-border/60 h-16">
           {navLinks.map((link) => {
             const isActive = pathname === link.path;
             const Icon = link.icon;
             return (
-              <li key={link.path}>
+              <li key={link.path} className="relative z-10 list-none flex-1 flex justify-center">
                 <Link
                   href={link.path}
-                  className={cn(
-                    "flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-300",
-                    isActive
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
+                  className="relative flex flex-col items-center justify-center w-full h-full"
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-[10px] font-medium">{link.name}</span>
+                  <div 
+                    className={cn(
+                      "relative flex items-center justify-center w-12 h-12 transition-all duration-500 z-20",
+                    )}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="mobile-active-bubble"
+                        className="absolute inset-0 bg-primary rounded-full border-[6px] border-background shadow-md shadow-primary/30"
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      />
+                    )}
+                    <Icon 
+                      className={cn(
+                        "w-5 h-5 relative z-30 transition-colors duration-300",
+                        isActive ? "text-primary-foreground" : "text-muted-foreground"
+                      )} 
+                    />
+                  </div>
+                  
                 </Link>
               </li>
             );
           })}
-        </ul>
+        </div>
       </nav>
     </>
   );

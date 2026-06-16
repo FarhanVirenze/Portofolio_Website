@@ -100,7 +100,7 @@ export default async function Home() {
 
         {/* Profile Image */}
         <div className="flex justify-center md:justify-end flex-shrink-0 animate-in fade-in slide-in-from-right-8 duration-1000">
-          <div className="relative w-56 h-56 md:w-86 md:h-86">
+          <div className="relative w-56 h-56 md:w-80 md:h-80">
             {/* Glow ring */}
             <div className="absolute -inset-3 bg-gradient-to-tr from-primary/50 via-violet-500/40 to-indigo-500/50 dark:-inset-2 dark:from-primary/30 dark:via-violet-400/20 dark:to-indigo-400/30 rounded-full blur-2xl dark:blur-xl animate-pulse-glow" />
             {/* Border ring */}
