@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Muhamad Farhan | Portfolio",
+  title: "Muhamad Farhan | Portofolio",
   description: "Personal website of Muhamad Farhan, a Full-stack Engineer.",
 };
 
