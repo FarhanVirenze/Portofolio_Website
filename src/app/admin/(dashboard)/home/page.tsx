@@ -1,0 +1,86 @@
+import { getServiceSupabase } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { updateHomeContent } from "@/app/actions/crud";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageCropperInput } from "@/components/admin/image-cropper-input";
+
+export default async function AdminHomePage() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const isSupabaseConfigured = supabaseUrl && supabaseUrl !== "your_supabase_project_url";
+
+  let homeContent: any = null;
+
+  if (isSupabaseConfigured) {
+    const supabase = getServiceSupabase();
+    const h = await supabase.from("home_content").select("*").limit(1).single();
+    homeContent = h.data;
+  }
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 max-w-4xl mx-auto">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Manage Home Section</h1>
+        <p className="text-muted-foreground mt-2">Update your greeting text, role descriptions, biography description, and resume file link.</p>
+      </div>
+
+      {!isSupabaseConfigured && (
+        <div className="bg-destructive/20 text-destructive border border-destructive rounded-lg p-4">
+          <strong>Supabase is not configured!</strong> Please update your <code>.env.local</code> to enable CRUD operations.
+        </div>
+      )}
+
+      {isSupabaseConfigured && (
+        <Card className="border border-border">
+          <CardHeader>
+            <CardTitle className="text-xl">Hero & Greeting Editor</CardTitle>
+            <CardDescription>Customize your first-impression text for visitors.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {homeContent ? (
+              <form action={updateHomeContent.bind(null, homeContent.id)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">Greeting Intro</label>
+                    <Input name="greeting" defaultValue={homeContent.greeting || "Hey there, I'm"} placeholder="e.g. Hey there, I'm" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">CV / Resume Link</label>
+                    <Input name="cv_url" defaultValue={homeContent.cv_url || "/resume.pdf"} placeholder="e.g. /resume.pdf or Google Drive link" />
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-semibold">Roles (comma separated for typewriter effect)</label>
+                    <Input name="roles" defaultValue={homeContent.roles?.join(", ") || ""} placeholder="Web Developer, UI/UX Designer, DevOps Engineer" required />
+                    <span className="text-xs text-muted-foreground">Separate roles using commas. Example: "Full Stack Developer, Flutter Engineer"</span>
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-semibold">Short Biography Description</label>
+                    <Textarea name="description" defaultValue={homeContent.description || "Welcome to my website."} placeholder="Write a short summary about yourself..." rows={4} required className="resize-none" />
+                  </div>
+
+                  <div className="space-y-3 md:col-span-2 border-t pt-4 border-border">
+                    <label className="text-sm font-semibold">Profile Photo</label>
+                    <ImageCropperInput existingImageUrl={homeContent.profile_image_url || undefined} />
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full md:w-auto px-8 py-2 font-medium">
+                  Save Changes
+                </Button>
+              </form>
+            ) : (
+              <div className="text-center py-6 text-muted-foreground">
+                <p className="text-sm">No hero content row found in the database.</p>
+                <p className="text-xs mt-1">Please seed or run the migration script to insert a default row in the <code>home_content</code> table.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
