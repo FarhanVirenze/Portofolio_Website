@@ -78,9 +78,9 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           alt={project.title}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end p-5">
-          <div className="flex items-center gap-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+        {/* Overlay on hover (Always visible on mobile) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 flex items-end p-5">
+          <div className="flex items-center gap-2 translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-500">
             {project.github_url && project.github_url !== 'null' && (
               <a 
                 href={project.github_url} 
