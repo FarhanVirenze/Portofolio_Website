@@ -101,7 +101,7 @@ export function Footer() {
         </div>
 
         <p className="text-xs text-muted-foreground/60 font-medium tracking-wide">
-          © {new Date().getFullYear()} Muhamad Farhan • Built with Next.js
+          © {new Date().getFullYear()} Muhamad Farhan
         </p>
       </div>
     </footer>
