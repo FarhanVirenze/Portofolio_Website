@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SoundProvider } from "@/components/sound-provider";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -81,6 +82,7 @@ export default function RootLayout({
             {children}
             <Toaster />
             <Analytics />
+            <SpeedInsights />
           </SoundProvider>
         </ThemeProvider>
       </body>
