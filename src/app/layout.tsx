@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { SoundProvider } from "@/components/sound-provider";
 import { Analytics } from "@vercel/analytics/react";
 
+import { GoogleAnalytics } from '@next/third-parties/google';
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -81,6 +83,7 @@ export default function RootLayout({
             {children}
             <Toaster />
             <Analytics />
+            {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
           </SoundProvider>
         </ThemeProvider>
       </body>
