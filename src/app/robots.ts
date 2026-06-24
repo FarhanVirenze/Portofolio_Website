@@ -1,8 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  // Ganti dengan domain website Anda yang sebenarnya
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://xffarhans.vercel.app';
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://xffarhans.vercel.app').replace(/\/+$/, '');
 
   return {
     rules: {
