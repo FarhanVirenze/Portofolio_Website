@@ -1,12 +1,11 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Ganti dengan domain website Anda yang sebenarnya
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://domain-anda.com';
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://xffarhans.vercel.app').replace(/\/+$/, '');
 
   return [
     {
-      url: `${baseUrl}/`,
+      url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 1,

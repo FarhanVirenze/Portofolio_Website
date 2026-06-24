@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://domain-anda.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://xffarhans.vercel.app'),
   title: {
     default: "Muhamad Farhan | Portofolio",
     template: "%s | Muhamad Farhan"
