@@ -5,7 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SoundProvider } from "@/components/sound-provider";
 import { Analytics } from "@vercel/analytics/react";
-
+import { cookies } from "next/headers";
+import { CookieConsent } from "@/components/cookie-consent";
 import { GoogleAnalytics } from '@next/third-parties/google';
 
 const inter = Inter({
@@ -63,11 +64,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const consentCookie = cookieStore.get("cookie_consent")?.value;
+  const hasConsented = consentCookie !== undefined;
+  const isAccepted = consentCookie === "accepted";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -83,7 +89,8 @@ export default function RootLayout({
             {children}
             <Toaster />
             <Analytics />
-            {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
+            {isAccepted && process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
+            <CookieConsent hasConsented={hasConsented} />
           </SoundProvider>
         </ThemeProvider>
       </body>

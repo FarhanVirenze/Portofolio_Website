@@ -2,6 +2,15 @@
 
 import { getServiceSupabase } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+
+async function verifyAuth() {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("admin_session");
+  if (!sessionCookie || sessionCookie.value !== "true") {
+    throw new Error("Unauthorized Access: You must be logged in as an admin to perform this action.");
+  }
+}
 
 async function uploadFileToStorage(file: File): Promise<string> {
   const supabase = getServiceSupabase();
@@ -57,6 +66,7 @@ async function uploadBase64ToStorage(base64DataUrl: string): Promise<string> {
 
 // HOME CONTENT
 export async function updateHomeContent(id: string, formData: FormData) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const roles = (formData.get("roles") as string).split(",").map(r => r.trim());
   let cv_url = formData.get("cv_url") as string;
@@ -94,6 +104,7 @@ export async function updateHomeContent(id: string, formData: FormData) {
 
 // ABOUT CONTENT
 export async function updateAboutContent(id: string, formData: FormData) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const rawParagraphs = formData.get("paragraphs") as string;
   const paragraphs = rawParagraphs.split(/\n\n+/).map(p => p.trim()).filter(p => p.length > 0);
@@ -120,6 +131,7 @@ export async function updateAboutContent(id: string, formData: FormData) {
 
 // SKILLS
 export async function addSkill(formData: FormData) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const name = formData.get("name") as string;
   const category = formData.get("category") as string;
@@ -139,6 +151,7 @@ export async function addSkill(formData: FormData) {
 }
 
 export async function updateSkill(id: string, formData: FormData) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const name = formData.get("name") as string;
   const category = formData.get("category") as string;
@@ -161,6 +174,7 @@ export async function updateSkill(id: string, formData: FormData) {
 }
 
 export async function deleteSkill(id: string) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("skills").delete().eq("id", id);
   if (error) throw new Error(error.message);
@@ -170,6 +184,7 @@ export async function deleteSkill(id: string) {
 
 // PROJECTS
 export async function addProject(formData: FormData) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
@@ -191,6 +206,7 @@ export async function addProject(formData: FormData) {
 }
 
 export async function updateProject(id: string, formData: FormData) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
@@ -215,6 +231,7 @@ export async function updateProject(id: string, formData: FormData) {
 }
 
 export async function deleteProject(id: string) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("projects").delete().eq("id", id);
   if (error) throw new Error(error.message);
@@ -224,6 +241,7 @@ export async function deleteProject(id: string) {
 
 // CERTIFICATIONS
 export async function addCertification(formData: FormData) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const title = formData.get("title") as string;
   const issuer = formData.get("issuer") as string;
@@ -245,6 +263,7 @@ export async function addCertification(formData: FormData) {
 }
 
 export async function updateCertification(id: string, formData: FormData) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const title = formData.get("title") as string;
   const issuer = formData.get("issuer") as string;
@@ -269,6 +288,7 @@ export async function updateCertification(id: string, formData: FormData) {
 }
 
 export async function deleteCertification(id: string) {
+  await verifyAuth();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("certifications").delete().eq("id", id);
   if (error) throw new Error(error.message);
