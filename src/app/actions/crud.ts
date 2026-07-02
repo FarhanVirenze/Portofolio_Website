@@ -3,6 +3,7 @@
 import { getServiceSupabase } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { trackServerAction, contentUpdatesTotal, fileUploadsTotal, fileUploadSize } from "@/lib/metrics";
 
 async function verifyAuth() {
   const cookieStore = await cookies();
@@ -22,12 +23,17 @@ async function uploadFileToStorage(file: File): Promise<string> {
     .from("images")
     .upload(filePath, file, { cacheControl: "3600", upsert: false });
 
-  if (error) throw new Error(`Upload failed: ${error.message}`);
+  if (error) {
+    fileUploadsTotal.inc({ type: "image", status: "error" });
+    throw new Error(`Upload failed: ${error.message}`);
+  }
 
   const { data: urlData } = supabase.storage
     .from("images")
     .getPublicUrl(filePath);
 
+  fileUploadsTotal.inc({ type: "image", status: "success" });
+  fileUploadSize.observe({ type: "image" }, file.size);
   return urlData.publicUrl;
 }
 
@@ -55,17 +61,22 @@ async function uploadBase64ToStorage(base64DataUrl: string): Promise<string> {
       contentType: mimeType,
     });
 
-  if (error) throw new Error(`Upload failed: ${error.message}`);
+  if (error) {
+    fileUploadsTotal.inc({ type: "image", status: "error" });
+    throw new Error(`Upload failed: ${error.message}`);
+  }
 
   const { data: urlData } = supabase.storage
     .from("images")
     .getPublicUrl(filePath);
 
+  fileUploadsTotal.inc({ type: "image", status: "success" });
+  fileUploadSize.observe({ type: "image" }, buffer.length);
   return urlData.publicUrl;
 }
 
 // HOME CONTENT
-export async function updateHomeContent(id: string, formData: FormData) {
+export const updateHomeContent = trackServerAction("updateHomeContent", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const roles = (formData.get("roles") as string).split(",").map(r => r.trim());
@@ -97,13 +108,15 @@ export async function updateHomeContent(id: string, formData: FormData) {
 
   const { error } = await supabase.from("home_content").update(updateData).eq("id", id);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "home", operation: "update" });
   revalidatePath("/");
   revalidatePath("/admin/home");
   revalidatePath("/admin/dashboard");
-}
+});
 
 // ABOUT CONTENT
-export async function updateAboutContent(id: string, formData: FormData) {
+export const updateAboutContent = trackServerAction("updateAboutContent", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const rawParagraphs = formData.get("paragraphs") as string;
@@ -125,12 +138,14 @@ export async function updateAboutContent(id: string, formData: FormData) {
 
   const { error } = await supabase.from("about_content").update(updateData).eq("id", id);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "about", operation: "update" });
   revalidatePath("/about");
   revalidatePath("/admin/about");
-}
+});
 
 // SKILLS
-export async function addSkill(formData: FormData) {
+export const addSkill = trackServerAction("addSkill", async (formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const name = formData.get("name") as string;
@@ -146,11 +161,13 @@ export async function addSkill(formData: FormData) {
 
   const { error } = await supabase.from("skills").insert([{ name, category, level, icon_url }]);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "skill", operation: "create" });
   revalidatePath("/about");
   revalidatePath("/admin/about");
-}
+});
 
-export async function updateSkill(id: string, formData: FormData) {
+export const updateSkill = trackServerAction("updateSkill", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const name = formData.get("name") as string;
@@ -169,21 +186,25 @@ export async function updateSkill(id: string, formData: FormData) {
 
   const { error } = await supabase.from("skills").update(updateData).eq("id", id);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "skill", operation: "update" });
   revalidatePath("/about");
   revalidatePath("/admin/about");
-}
+});
 
-export async function deleteSkill(id: string) {
+export const deleteSkill = trackServerAction("deleteSkill", async (id: string) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("skills").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "skill", operation: "delete" });
   revalidatePath("/about");
   revalidatePath("/admin/about");
-}
+});
 
 // PROJECTS
-export async function addProject(formData: FormData) {
+export const addProject = trackServerAction("addProject", async (formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const title = formData.get("title") as string;
@@ -201,11 +222,13 @@ export async function addProject(formData: FormData) {
 
   const { error } = await supabase.from("projects").insert([{ title, description, image_url, tech_stack, github_url, demo_url }]);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "project", operation: "create" });
   revalidatePath("/portofolio");
   revalidatePath("/admin/portofolio");
-}
+});
 
-export async function updateProject(id: string, formData: FormData) {
+export const updateProject = trackServerAction("updateProject", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const title = formData.get("title") as string;
@@ -226,21 +249,25 @@ export async function updateProject(id: string, formData: FormData) {
 
   const { error } = await supabase.from("projects").update(updateData).eq("id", id);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "project", operation: "update" });
   revalidatePath("/portofolio");
   revalidatePath("/admin/portofolio");
-}
+});
 
-export async function deleteProject(id: string) {
+export const deleteProject = trackServerAction("deleteProject", async (id: string) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("projects").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "project", operation: "delete" });
   revalidatePath("/portofolio");
   revalidatePath("/admin/portofolio");
-}
+});
 
 // CERTIFICATIONS
-export async function addCertification(formData: FormData) {
+export const addCertification = trackServerAction("addCertification", async (formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const title = formData.get("title") as string;
@@ -258,11 +285,13 @@ export async function addCertification(formData: FormData) {
 
   const { error } = await supabase.from("certifications").insert([{ title, issuer, issued_date, image_url, credential_url, description }]);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "certification", operation: "create" });
   revalidatePath("/certification");
   revalidatePath("/admin/certification");
-}
+});
 
-export async function updateCertification(id: string, formData: FormData) {
+export const updateCertification = trackServerAction("updateCertification", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const title = formData.get("title") as string;
@@ -283,15 +312,19 @@ export async function updateCertification(id: string, formData: FormData) {
 
   const { error } = await supabase.from("certifications").update(updateData).eq("id", id);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "certification", operation: "update" });
   revalidatePath("/certification");
   revalidatePath("/admin/certification");
-}
+});
 
-export async function deleteCertification(id: string) {
+export const deleteCertification = trackServerAction("deleteCertification", async (id: string) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("certifications").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "certification", operation: "delete" });
   revalidatePath("/certification");
   revalidatePath("/admin/certification");
-}
+});

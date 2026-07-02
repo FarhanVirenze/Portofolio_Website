@@ -1,8 +1,9 @@
 "use server";
 
 import { getServiceSupabase } from "@/lib/supabase";
+import { fileUploadsTotal, fileUploadSize, trackServerAction } from "@/lib/metrics";
 
-export async function uploadImage(formData: FormData): Promise<string> {
+export const uploadImage = trackServerAction("uploadImage", async (formData: FormData): Promise<string> => {
   const file = formData.get("file") as File;
   if (!file || file.size === 0) {
     throw new Error("No file provided");
@@ -28,5 +29,7 @@ export async function uploadImage(formData: FormData): Promise<string> {
     .from("images")
     .getPublicUrl(filePath);
 
+  fileUploadsTotal.inc({ type: "image", status: "success" });
+  fileUploadSize.observe({ type: "image" }, file.size);
   return urlData.publicUrl;
-}
+});

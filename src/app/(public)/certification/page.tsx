@@ -1,6 +1,8 @@
 import { ExternalLink, Calendar, Award, Building2 } from "lucide-react";
 import type { Certification as CertificationType } from "@/lib/types";
 import { getServiceSupabase } from "@/lib/supabase";
+import { CertificationGrid } from "@/components/certification-grid";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 // Mock data (fallback)
 const mockCertificates: CertificationType[] = [];
@@ -20,36 +22,40 @@ export default async function Certification() {
   }
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
-      {/* Header */}
-      <header className="space-y-4">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <Award className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">Certifications</h1>
-            <p className="text-sm text-muted-foreground">Professional credentials & achievements</p>
-          </div>
-        </div>
-      </header>
+    <CertificationGrid>
+      <div className="space-y-12 pb-10">
+        {/* Header */}
+        <ScrollReveal direction="down" distance={20}>
+          <header className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                <Award className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-foreground">Certifications</h1>
+                <p className="text-sm text-muted-foreground">Professional credentials & achievements</p>
+              </div>
+            </div>
+          </header>
+        </ScrollReveal>
 
-      {/* Card Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {certifications.map((cert, index) => (
-          <CertificateCard key={cert.id} cert={cert} index={index} />
-        ))}
+        {/* Card Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {certifications.map((cert, index) => (
+            <CertificateCard key={cert.id} cert={cert} index={index} />
+          ))}
+        </div>
+
+        {certifications.length === 0 && (
+          <div className="text-center py-20">
+            <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
+              <Award className="w-8 h-8 text-muted-foreground/50" />
+            </div>
+            <p className="text-muted-foreground">No certifications yet. Add some from the admin dashboard.</p>
+          </div>
+        )}
       </div>
-
-      {certifications.length === 0 && (
-        <div className="text-center py-20">
-          <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
-            <Award className="w-8 h-8 text-muted-foreground/50" />
-          </div>
-          <p className="text-muted-foreground">No certifications yet. Add some from the admin dashboard.</p>
-        </div>
-      )}
-    </div>
+    </CertificationGrid>
   );
 }
 
@@ -66,8 +72,7 @@ function CertificateCard({ cert, index }: { cert: CertificationType; index: numb
 
   return (
     <article 
-      className="group flex flex-col bg-card border border-border rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/30"
-      style={{ animationDelay: `${index * 80}ms` }}
+      className="certification-card opacity-0 group flex flex-col bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/30"
     >
       {/* Certificate Image */}
       <a 
