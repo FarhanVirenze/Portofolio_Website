@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { cookies } from "next/headers";
 import { CookieConsent } from "@/components/cookie-consent";
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { LenisProvider } from "@/components/lenis-provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -86,11 +87,13 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <SoundProvider>
-            {children}
-            <Toaster />
-            <Analytics />
-            {isAccepted && process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
-            <CookieConsent hasConsented={hasConsented} />
+            <LenisProvider>
+              {children}
+              <Toaster />
+              <Analytics />
+              {isAccepted && process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
+              <CookieConsent hasConsented={hasConsented} />
+            </LenisProvider>
           </SoundProvider>
         </ThemeProvider>
       </body>

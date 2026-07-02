@@ -133,11 +133,11 @@ export function SplashScreen() {
       ease: "power2.in",
     }, "<"); // start at the same time as camera zoom
 
-    // 6. Split / Slide up the overlay background to reveal website
+    // 6. Fade out the overlay background to reveal website
     tl.to(overlayRef.current, {
-      yPercent: -100,
+      opacity: 0,
       duration: 1.2,
-      ease: "power4.inOut",
+      ease: "power2.inOut",
     }, "-=0.2"); // overlap slightly with the end of the zoom
 
     // Cleanup on unmount
@@ -155,11 +155,8 @@ export function SplashScreen() {
     };
   }, [mounted, isLoaded, resolvedTheme, setIsLoaded]);
 
-  // Don't render anything if not mounted (avoid hydration mismatch on theme)
-  if (!mounted) return null;
-
   // Once loaded, we can completely remove the DOM element after the animation finishes
-  // but the GSAP timeline handles the visual sliding out.
+  // but the GSAP timeline handles the visual fading out.
   // We keep it in the DOM but translated away until React unmounts it (which we might just leave invisible).
 
   const text = "SYSTEM READY";
