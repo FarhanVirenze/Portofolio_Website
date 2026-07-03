@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Cookie } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +15,7 @@ function setCookie(name: string, value: string, days: number) {
 
 export function CookieConsent({ hasConsented }: { hasConsented: boolean }) {
   const [show, setShow] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     // Tampilkan banner hanya jika user belum pernah memberikan persetujuan (belum ada cookie)
@@ -27,8 +29,9 @@ export function CookieConsent({ hasConsented }: { hasConsented: boolean }) {
   const accept = () => {
     setCookie("cookie_consent", "accepted", 365);
     setShow(false);
-    // Reload halaman agar server (layout.tsx) membaca cookie baru dan memuat Google Analytics
-    window.location.reload(); 
+    // Soft refresh: hanya me-refresh data server (layout.tsx membaca cookie baru)
+    // tanpa full page reload, sehingga splash screen tidak muncul ulang
+    router.refresh();
   };
 
   const reject = () => {
