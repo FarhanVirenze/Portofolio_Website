@@ -16,7 +16,7 @@ export default function PublicLayout({
         <SplashScreen />
         <ParticleBackground />
         <Navbar />
-        <main className="flex-1 pt-24 md:pt-32 px-4 max-w-7xl w-full mx-auto pb-20">
+        <main className="flex-1 w-full">
           {children}
         </main>
         <Footer />

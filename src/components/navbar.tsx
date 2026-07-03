@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -9,14 +8,14 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Home, User, Briefcase, Award } from "lucide-react";
 
 const navLinks = [
-  { name: "Home", path: "/", icon: Home },
-  { name: "About", path: "/about", icon: User },
-  { name: "Portofolio", path: "/portofolio", icon: Briefcase },
-  { name: "Certification", path: "/certification", icon: Award },
+  { name: "Home", path: "#hero", icon: Home },
+  { name: "About", path: "#about", icon: User },
+  { name: "Portofolio", path: "#portfolio", icon: Briefcase },
+  { name: "Certification", path: "#certification", icon: Award },
 ];
 
 export function Navbar() {
-  const pathname = usePathname();
+  const [activeSection, setActiveSection] = useState("#hero");
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -26,6 +25,55 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    // Intersection Observer to detect active section
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the entry that is intersecting the most
+        let maxRatio = 0;
+        let mostVisibleSection = activeSection;
+
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            mostVisibleSection = `#${entry.target.id}`;
+          }
+        });
+
+        // Special case for portfolio because it pins (starts taking up 100% early)
+        // Adjusting thresholds based on what's visible
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.2) {
+             // If a section takes up at least 20% of screen, consider it active
+             setActiveSection(`#${entry.target.id}`);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "-20% 0px -40% 0px", // Trigger when element is somewhat in the middle of screen
+        threshold: [0, 0.2, 0.5, 0.8, 1.0],
+      }
+    );
+
+    const sections = document.querySelectorAll("section[id], div[id='portfolio'], div[id='certification'], div[id='about']");
+    sections.forEach((section) => observer.observe(section));
+
+    return () => {
+      sections.forEach((section) => observer.unobserve(section));
+    };
+  }, []);
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    e.preventDefault();
+    const targetId = path.replace("#", "");
+    const elem = document.getElementById(targetId);
+    if (elem) {
+      elem.scrollIntoView({ behavior: "smooth", block: "start" });
+      setActiveSection(path);
+    }
+  };
 
   return (
     <>
@@ -38,23 +86,24 @@ export function Navbar() {
             : "bg-transparent py-5"
         )}
       >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link
-            href="/"
+        <div className="w-full px-6 md:px-10 lg:px-16 flex items-center justify-between">
+          <a
+            href="#hero"
+            onClick={(e) => handleClick(e, "#hero")}
             className="text-2xl font-semibold text-primary hover:text-primary/80 transition-colors font-mono tracking-tight"
           >
-            <span className="text-2xl foreground"></span>
             Farhan():
-          </Link>
+          </a>
 
           <div className="flex items-center gap-8">
             <ul className="flex items-center gap-1 text-sm font-medium bg-muted/50 backdrop-blur-sm rounded-full px-1.5 py-1.5 border border-border/50">
               {navLinks.map((link) => {
-                const isActive = pathname === link.path;
+                const isActive = activeSection === link.path;
                 return (
                   <li key={link.path} className="relative">
-                    <Link
+                    <a
                       href={link.path}
+                      onClick={(e) => handleClick(e, link.path)}
                       className={cn(
                         "relative z-10 px-4 py-1.5 rounded-full transition-colors duration-300 block",
                         isActive
@@ -63,7 +112,7 @@ export function Navbar() {
                       )}
                     >
                       {link.name}
-                    </Link>
+                    </a>
                     {isActive && (
                       <motion.div
                         layoutId="active-nav-pill"
@@ -90,12 +139,13 @@ export function Navbar() {
       <nav className="md:hidden fixed bottom-1 left-4 right-4 z-50">
         <div className="bg-background/50 backdrop-blur-xl rounded-full shadow-2xl shadow-primary/10 px-2 flex items-center justify-around relative border border-border/60 h-16">
           {navLinks.map((link) => {
-            const isActive = pathname === link.path;
+            const isActive = activeSection === link.path;
             const Icon = link.icon;
             return (
               <li key={link.path} className="relative z-10 list-none flex-1 flex justify-center">
-                <Link
+                <a
                   href={link.path}
+                  onClick={(e) => handleClick(e, link.path)}
                   className="relative flex flex-col items-center justify-center w-full h-full"
                 >
                   <div 
@@ -118,7 +168,7 @@ export function Navbar() {
                     />
                   </div>
                   
-                </Link>
+                </a>
               </li>
             );
           })}

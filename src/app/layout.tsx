@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -10,8 +10,8 @@ import { CookieConsent } from "@/components/cookie-consent";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { LenisProvider } from "@/components/lenis-provider";
 
-const inter = Inter({
-  variable: "--font-inter",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-inter", // Keep variable name same so we don't break Tailwind config if it uses it
   subsets: ["latin"],
 });
 
@@ -78,13 +78,12 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} antialiased min-h-screen bg-background text-foreground flex flex-col font-sans`}
+        className={`${jakarta.variable} ${jetbrainsMono.variable} antialiased min-h-screen bg-background text-foreground flex flex-col font-sans overflow-x-hidden`}
       >
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
-          disableTransitionOnChange
         >
           <SoundProvider>
             <LenisProvider>
