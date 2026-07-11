@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail } from "lucide-react";
 import { supportContact } from "@/lib/store";
 
 // Custom SVGs for brand icons
@@ -99,27 +99,6 @@ export function Footer() {
               {link.icon}
             </a>
           ))}
-        </div>
-
-        <div className="grid w-full max-w-4xl grid-cols-1 gap-3 text-sm text-muted-foreground md:grid-cols-3">
-          <a
-            href={`mailto:${supportContact.email}`}
-            className="flex items-center justify-center gap-2 rounded-xl border border-border/50 px-4 py-3 transition-colors hover:border-primary/30 hover:text-foreground"
-          >
-            <Mail className="h-4 w-4 text-primary" />
-            {supportContact.email}
-          </a>
-          <a
-            href={`tel:${supportContact.phone.replace(/[^+\d]/g, "")}`}
-            className="flex items-center justify-center gap-2 rounded-xl border border-border/50 px-4 py-3 transition-colors hover:border-primary/30 hover:text-foreground"
-          >
-            <Phone className="h-4 w-4 text-primary" />
-            {supportContact.phone}
-          </a>
-          <div className="flex items-center justify-center gap-2 rounded-xl border border-border/50 px-4 py-3 text-center">
-            <MapPin className="h-4 w-4 shrink-0 text-primary" />
-            {supportContact.address}
-          </div>
         </div>
 
         <p className="text-xs text-muted-foreground/60 font-medium tracking-wide">

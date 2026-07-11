@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/",
     title: "Muhamad Farhan | Produk Digital & Portofolio",
-    description: "Portofolio dan produk jasa pembuatan website dengan checkout pembayaran online via Duitku Sandbox.",
+    description: "Portofolio dan produk jasa pembuatan website dengan checkout pembayaran online.",
     siteName: "Muhamad Farhan Portfolio",
     images: [
       {
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Muhamad Farhan | Produk Digital & Portofolio",
-    description: "Portofolio dan produk jasa pembuatan website dengan checkout pembayaran online via Duitku Sandbox.",
+    description: "Portofolio dan produk jasa pembuatan website dengan checkout pembayaran online.",
     creator: "@farhan", // Ganti dengan handle twitter jika ada
   },
   robots: {

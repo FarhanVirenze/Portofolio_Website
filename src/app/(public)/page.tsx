@@ -2,13 +2,13 @@ import { Typewriter } from "@/components/typewriter";
 import { Download } from "lucide-react";
 import { getServiceSupabase } from "@/lib/supabase";
 import { MagneticButton } from "@/components/ui/magnetic-button";
-import { TextSplitReveal } from "@/components/ui/text-split-reveal";
 import { HomeHero } from "@/components/home-hero";
 import { ThreeJsHero } from "@/components/three-js-hero";
 import { AboutSection } from "@/components/sections/about-section";
 import { PortfolioSection } from "@/components/sections/portfolio-section";
 import { CertificationSection } from "@/components/sections/certification-section";
 import { StoreSection } from "@/components/sections/store-section";
+import { SupportSection } from "@/components/sections/support-section";
 import { Skill, Project, Certification } from "@/lib/types";
 
 export default async function Home() {
@@ -154,11 +154,14 @@ export default async function Home() {
       {/* 3. Portfolio Section */}
       <PortfolioSection projects={projects} />
 
-      {/* 4. Product & Checkout Section */}
+      {/* 4. Product Section */}
       <StoreSection />
 
       {/* 5. Certification Section */}
       <CertificationSection certifications={certifications} />
+
+      {/* 6. Support Section */}
+      <SupportSection />
       
     </div>
   );

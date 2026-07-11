@@ -47,7 +47,7 @@ export default async function CheckoutReturnPage({ searchParams }: CheckoutRetur
         <div className={`mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted ${status.tone}`}>
           <StatusIcon className="h-8 w-8" />
         </div>
-        <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Duitku API V2</p>
+        <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground"></p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{status.title}</h1>
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">{status.description}</p>
 
