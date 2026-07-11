@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Check, Copy, ExternalLink, QrCode, Smartphone, Wallet } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { formatRupiah } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import { getPaymentInstructionType, type DuitkuInquiryResponse } from "@/lib/duitku";
 
 type PaymentInstructionsProps = {
@@ -104,12 +105,15 @@ export function PaymentInstructions({
       </div>
 
       <div className="mt-auto space-y-3 pt-8">
-        <Button asChild size="lg" className="h-11 w-full gap-2 rounded-xl">
-          <a href={paymentUrl} target="_blank" rel="noreferrer">
-            <Wallet className="h-4 w-4" />
-            Buka halaman pembayaran Duitku
-          </a>
-        </Button>
+        <a
+          href={paymentUrl}
+          target="_blank"
+          rel="noreferrer"
+          className={cn(buttonVariants({ size: "lg" }), "h-11 w-full gap-2 rounded-xl")}
+        >
+          <Wallet className="h-4 w-4" />
+          Buka halaman pembayaran Duitku
+        </a>
         <p className="text-center text-xs text-muted-foreground">
           Status pembayaran akan diperbarui otomatis setelah Duitku mengirim callback ke server.
         </p>
