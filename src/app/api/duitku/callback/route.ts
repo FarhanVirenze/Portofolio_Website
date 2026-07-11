@@ -8,7 +8,7 @@ function signCallback(merchantCode: string, amount: string, merchantOrderId: str
 }
 
 export async function POST(request: Request) {
-  const apiKey = process.env.DUITKU_API_KEY;
+  const apiKey = process.env.DUITKU_API_KEY?.trim();
 
   if (!apiKey) {
     return new Response("Duitku API key is not configured", { status: 500 });

@@ -17,6 +17,19 @@ function getBaseUrl() {
   return (process.env.NEXT_PUBLIC_APP_URL || "https://xffarhans.my.id").replace(/\/+$/, "");
 }
 
+function getEnv(name: string) {
+  return process.env[name]?.trim();
+}
+
+function getDuitkuDiagnostics(merchantCode: string, inquiryUrl: string, mode: string) {
+  return {
+    mode,
+    inquiryUrl,
+    merchantCode,
+    hasApiKey: Boolean(getEnv("DUITKU_API_KEY")),
+  };
+}
+
 function signInquiry(merchantCode: string, merchantOrderId: string, paymentAmount: number, apiKey: string) {
   return crypto
     .createHmac("sha256", apiKey)
@@ -34,12 +47,17 @@ function splitName(name: string) {
 
 export async function POST(request: Request) {
   try {
-    const merchantCode = process.env.DUITKU_MERCHANT_CODE;
-    const apiKey = process.env.DUITKU_API_KEY;
+    const merchantCode = getEnv("DUITKU_MERCHANT_CODE");
+    const apiKey = getEnv("DUITKU_API_KEY");
+    const duitkuMode = getEnv("DUITKU_MODE") || "sandbox";
+    const configuredInquiryUrl = getEnv("DUITKU_INQUIRY_URL");
 
     if (!merchantCode || !apiKey) {
       return Response.json(
-        { message: "Kredensial Sandbox Duitku belum dikonfigurasi di server." },
+        {
+          message:
+            "Kredensial Duitku belum dikonfigurasi. Pastikan DUITKU_MERCHANT_CODE dan DUITKU_API_KEY tersedia di environment server.",
+        },
         { status: 500 }
       );
     }
@@ -100,8 +118,8 @@ export async function POST(request: Request) {
     const signature = signInquiry(merchantCode, merchantOrderId, product.price, apiKey);
     const { firstName, lastName } = splitName(customerName);
     const inquiryUrl =
-      process.env.DUITKU_INQUIRY_URL ||
-      (process.env.DUITKU_MODE === "production" ? duitkuProductionInquiryUrl : duitkuSandboxInquiryUrl);
+      configuredInquiryUrl ||
+      (duitkuMode === "production" ? duitkuProductionInquiryUrl : duitkuSandboxInquiryUrl);
 
     const customerAddress = {
       firstName,
@@ -114,6 +132,7 @@ export async function POST(request: Request) {
     };
 
     const payload = {
+      merchantCode,
       paymentAmount: product.price,
       paymentMethod: paymentMethod.code,
       merchantOrderId,
@@ -187,6 +206,7 @@ export async function POST(request: Request) {
         {
           message: data?.statusMessage || data?.Message || "Duitku belum bisa membuat transaksi.",
           detail: data,
+          diagnostics: getDuitkuDiagnostics(merchantCode, inquiryUrl, duitkuMode),
         },
         { status: duitkuResponse.status || 502 }
       );
