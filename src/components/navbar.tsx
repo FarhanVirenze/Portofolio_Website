@@ -134,13 +134,12 @@ export function Navbar() {
         )}
       >
         <div className="w-full px-6 md:px-10 lg:px-16 flex items-center justify-between">
-          <a
-            href="#hero"
-            onClick={(e) => handleClick(e, "#hero")}
+          <Link
+            href="/"
             className="text-2xl font-semibold text-primary hover:text-primary/80 transition-colors font-mono tracking-tight"
           >
-            Farhan():
-          </a>
+            Farhan();
+          </Link>
 
           <div className="flex items-center gap-8">
             <ul className="flex items-center gap-1 text-sm font-medium bg-muted/50 backdrop-blur-sm rounded-full px-1.5 py-1.5 border border-border/50">
@@ -182,13 +181,12 @@ export function Navbar() {
 
       {/* Mobile Top Right Theme Toggle */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-[60] flex items-center justify-between px-4 py-3 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <a
-          href="#hero"
-          onClick={(e) => handleClick(e, "#hero")}
+        <Link
+          href="/"
           className="text-xl font-semibold font-mono tracking-tight text-primary transition-colors hover:text-primary/80"
         >
           Farhan();
-        </a>
+        </Link>
         <div className="flex items-center gap-2">
           <UserMenu user={user} displayName={displayName} initials={initials} onLogout={handleLogout} profileIncomplete={profileIncomplete} compact />
           <ThemeToggle />
