@@ -185,8 +185,8 @@ function LoginPageInner() {
 
             <div className="flex flex-col items-start mb-8">
               <h1 className="text-3xl font-bold tracking-tight">
-                <span className="bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">Masuk</span>{" "}
-                <span className="text-foreground">Akun</span>
+                <span className="bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">Sign</span>{" "}
+                <span className="text-foreground">In</span>
               </h1>
               <p className="mt-2 text-muted-foreground text-sm">
                 Selamat datang kembali! Silakan masuk ke akun kamu.
