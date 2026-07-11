@@ -22,13 +22,13 @@ type PaymentMethodSelectProps = {
 
 const categoryConfig: Record<
   PaymentMethod["category"],
-  { label: string; icon: typeof Building2; color: string }
+  { label: string; icon: typeof Building2; color: string; bg: string }
 > = {
-  "virtual-account": { label: "Virtual Account", icon: Building2, color: "text-blue-500" },
-  qris: { label: "QRIS", icon: QrCode, color: "text-emerald-500" },
-  "e-wallet": { label: "E-Wallet", icon: WalletCards, color: "text-violet-500" },
-  retail: { label: "Retail", icon: Store, color: "text-orange-500" },
-  card: { label: "Kartu", icon: CreditCard, color: "text-rose-500" },
+  "virtual-account": { label: "Virtual Account", icon: Building2, color: "text-blue-500", bg: "bg-blue-500/10" },
+  qris: { label: "QRIS", icon: QrCode, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+  "e-wallet": { label: "E-Wallet", icon: WalletCards, color: "text-violet-500", bg: "bg-violet-500/10" },
+  retail: { label: "Retail", icon: Store, color: "text-orange-500", bg: "bg-orange-500/10" },
+  card: { label: "Kartu", icon: CreditCard, color: "text-rose-500", bg: "bg-rose-500/10" },
 };
 
 function getMethodIcon(code: string, category: PaymentMethod["category"]) {
@@ -92,7 +92,7 @@ export function PaymentMethodSelect({ methods, value, onChange }: PaymentMethodS
   ];
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="w-full">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -103,7 +103,7 @@ export function PaymentMethodSelect({ methods, value, onChange }: PaymentMethodS
         )}
       >
         {selected && (
-          <span className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10", selectedCategory?.color)}>
+          <span className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-lg", selectedCategory?.bg, selectedCategory?.color)}>
             <SelectedIcon className="h-3.5 w-3.5" />
           </span>
         )}
@@ -126,61 +126,63 @@ export function PaymentMethodSelect({ methods, value, onChange }: PaymentMethodS
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-2 max-h-80 w-full overflow-y-auto rounded-xl border border-border bg-popover p-1.5 shadow-lg animate-in fade-in-0 zoom-in-95">
-          {categoryOrder.map((category) => {
-            const items = grouped[category];
-            if (!items || items.length === 0) return null;
+        <div className="mt-2 max-h-72 overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
+          <div className="p-2">
+            {categoryOrder.map((category) => {
+              const items = grouped[category];
+              if (!items || items.length === 0) return null;
 
-            const catConfig = categoryConfig[category];
-            const CatIcon = catConfig.icon;
+              const catConfig = categoryConfig[category];
+              const CatIcon = catConfig.icon;
 
-            return (
-              <div key={category} className="mb-1">
-                <div className="flex items-center gap-2 px-3 py-1.5">
-                  <CatIcon className={cn("h-3 w-3", catConfig.color)} />
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {catConfig.label}
-                  </span>
-                </div>
+              return (
+                <div key={category} className="mb-1 last:mb-0">
+                  <div className="flex items-center gap-2 px-3 py-2">
+                    <CatIcon className={cn("h-3.5 w-3.5", catConfig.color)} />
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      {catConfig.label}
+                    </span>
+                  </div>
 
-                {items.map((method) => {
-                  const isSelected = method.code === value;
-                  const MethodIcon = getMethodIcon(method.code, method.category);
+                  {items.map((method) => {
+                    const isSelected = method.code === value;
+                    const MethodIcon = getMethodIcon(method.code, method.category);
 
-                  return (
-                    <button
-                      key={method.code}
-                      type="button"
-                      onClick={() => {
-                        onChange(method.code);
-                        setIsOpen(false);
-                      }}
-                      className={cn(
-                        "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
-                        "hover:bg-accent hover:text-accent-foreground",
-                        isSelected && "bg-primary/10 text-primary"
-                      )}
-                    >
-                      <span
+                    return (
+                      <button
+                        key={method.code}
+                        type="button"
+                        onClick={() => {
+                          onChange(method.code);
+                          setIsOpen(false);
+                        }}
                         className={cn(
-                          "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted",
-                          isSelected ? "bg-primary/20" : "",
-                          catConfig.color
+                          "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
+                          "hover:bg-accent hover:text-accent-foreground",
+                          isSelected && "bg-primary/10 text-primary"
                         )}
                       >
-                        <MethodIcon className="h-3.5 w-3.5" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-medium">{method.name}</span>
-                        <span className="block text-xs text-muted-foreground">{method.description}</span>
-                      </span>
-                      {isSelected && <Check className="h-4 w-4 shrink-0 text-primary" />}
-                    </button>
-                  );
-                })}
-              </div>
-            );
-          })}
+                        <span
+                          className={cn(
+                            "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+                            isSelected ? "bg-primary/20" : catConfig.bg,
+                            catConfig.color
+                          )}
+                        >
+                          <MethodIcon className="h-3.5 w-3.5" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block font-medium">{method.name}</span>
+                          <span className="block text-xs text-muted-foreground">{method.description}</span>
+                        </span>
+                        {isSelected && <Check className="h-4 w-4 shrink-0 text-primary" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
