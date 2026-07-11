@@ -2,13 +2,51 @@
 
 import Link from "next/link";
 import { useMemo, useState, type FormEvent } from "react";
-import { ArrowLeft, CheckCircle2, Loader2, Package, ShieldCheck, ShoppingCart } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  CheckCircle2,
+  CreditCard,
+  Loader2,
+  Package,
+  QrCode,
+  ShieldCheck,
+  ShoppingCart,
+  Store,
+  WalletCards,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatRupiah, paymentMethods, products } from "@/lib/store";
+import { formatRupiah, paymentMethods, products, type PaymentMethod } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 type CheckoutPageProps = {
   initialProductId?: string;
 };
+
+const paymentCategoryOrder: PaymentMethod["category"][] = [
+  "virtual-account",
+  "qris",
+  "e-wallet",
+  "retail",
+  "card",
+];
+
+const paymentCategoryLabels: Record<PaymentMethod["category"], string> = {
+  card: "Kartu",
+  "virtual-account": "Virtual Account",
+  qris: "QRIS",
+  "e-wallet": "E-Wallet",
+  retail: "Retail",
+};
+
+function getPaymentIcon(category: PaymentMethod["category"]) {
+  if (category === "card") return CreditCard;
+  if (category === "qris") return QrCode;
+  if (category === "e-wallet") return WalletCards;
+  if (category === "retail") return Store;
+
+  return Building2;
+}
 
 export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
   const initialProduct = products.find((product) => product.id === initialProductId) ?? products[0];
@@ -25,6 +63,17 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
   const selectedPayment = useMemo(
     () => paymentMethods.find((method) => method.code === paymentMethod) ?? paymentMethods[0],
     [paymentMethod]
+  );
+
+  const paymentGroups = useMemo(
+    () =>
+      paymentCategoryOrder
+        .map((category) => ({
+          category,
+          methods: paymentMethods.filter((method) => method.category === category),
+        }))
+        .filter((group) => group.methods.length > 0),
+    []
   );
 
   const submitCheckout = async (event: FormEvent<HTMLFormElement>) => {
@@ -101,30 +150,73 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
                 <select
                   value={productId}
                   onChange={(event) => setProductId(event.target.value)}
-                  className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+                  className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none transition-colors [color-scheme:dark] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
                 >
                   {products.map((product) => (
-                    <option key={product.id} value={product.id}>
+                    <option key={product.id} value={product.id} className="bg-background text-foreground">
                       {product.name} - {formatRupiah(product.price)}
                     </option>
                   ))}
                 </select>
               </label>
 
-              <label className="block space-y-2 text-sm font-medium text-foreground">
-                Metode Pembayaran
-                <select
-                  value={paymentMethod}
-                  onChange={(event) => setPaymentMethod(event.target.value)}
-                  className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
-                >
-                  {paymentMethods.map((method) => (
-                    <option key={method.code} value={method.code}>
-                      {method.name} ({method.code})
-                    </option>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Metode Pembayaran</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    API V2 perlu memilih satu channel pembayaran. Pilih channel yang sudah aktif di merchant Duitku kamu.
+                  </p>
+                </div>
+
+                <div className="space-y-5">
+                  {paymentGroups.map((group) => (
+                    <div key={group.category} className="space-y-2">
+                      <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
+                        {paymentCategoryLabels[group.category]}
+                      </p>
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        {group.methods.map((method) => {
+                          const PaymentIcon = getPaymentIcon(method.category);
+                          const isSelected = paymentMethod === method.code;
+
+                          return (
+                            <button
+                              key={method.code}
+                              type="button"
+                              aria-pressed={isSelected}
+                              onClick={() => setPaymentMethod(method.code)}
+                              className={cn(
+                                "flex min-h-20 items-start gap-3 rounded-xl border border-border bg-background p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/5 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/20",
+                                isSelected && "border-primary bg-primary/10 shadow-lg shadow-primary/10"
+                              )}
+                            >
+                              <span
+                                className={cn(
+                                  "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground",
+                                  isSelected && "border-primary/30 bg-primary/15 text-primary"
+                                )}
+                              >
+                                <PaymentIcon className="h-4 w-4" />
+                              </span>
+                              <span className="min-w-0">
+                                <span className="flex items-center gap-2">
+                                  <span className="font-medium text-foreground">{method.name}</span>
+                                  <span className="rounded-md border border-border px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                                    {method.code}
+                                  </span>
+                                </span>
+                                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+                                  {method.description}
+                                </span>
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   ))}
-                </select>
-              </label>
+                </div>
+              </div>
 
               <div className="rounded-xl border border-border/70 bg-muted/30 p-4 text-sm leading-relaxed text-muted-foreground">
                 Belum lengkap data checkout? Perbarui nama, telepon, dan alamat di{" "}

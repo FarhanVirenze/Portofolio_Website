@@ -12,6 +12,7 @@ export type PaymentMethod = {
   code: string;
   name: string;
   description: string;
+  category: "card" | "virtual-account" | "qris" | "e-wallet" | "retail";
 };
 
 export const products: Product[] = [
@@ -52,31 +53,109 @@ export const paymentMethods: PaymentMethod[] = [
     code: "VC",
     name: "Kartu Kredit",
     description: "Visa / MasterCard / JCB",
+    category: "card",
   },
   {
     code: "BC",
     name: "BCA Virtual Account",
     description: "Pembayaran melalui VA BCA",
+    category: "virtual-account",
   },
   {
     code: "M2",
     name: "Mandiri Virtual Account",
     description: "Pembayaran melalui VA Mandiri",
+    category: "virtual-account",
   },
   {
     code: "I1",
     name: "BNI Virtual Account",
     description: "Pembayaran melalui VA BNI",
+    category: "virtual-account",
   },
   {
     code: "BR",
     name: "BRIVA",
     description: "Pembayaran melalui BRI Virtual Account",
+    category: "virtual-account",
+  },
+  {
+    code: "BT",
+    name: "Permata Virtual Account",
+    description: "Pembayaran melalui VA Permata Bank",
+    category: "virtual-account",
+  },
+  {
+    code: "B1",
+    name: "CIMB Niaga Virtual Account",
+    description: "Pembayaran melalui VA CIMB Niaga",
+    category: "virtual-account",
+  },
+  {
+    code: "VA",
+    name: "Maybank Virtual Account",
+    description: "Pembayaran melalui VA Maybank",
+    category: "virtual-account",
+  },
+  {
+    code: "A1",
+    name: "ATM Bersama",
+    description: "Pembayaran melalui jaringan ATM Bersama",
+    category: "virtual-account",
   },
   {
     code: "SP",
     name: "QRIS ShopeePay",
-    description: "Pembayaran QRIS",
+    description: "Pembayaran QRIS ShopeePay",
+    category: "qris",
+  },
+  {
+    code: "NQ",
+    name: "QRIS Nobu",
+    description: "Pembayaran QRIS Nobu",
+    category: "qris",
+  },
+  {
+    code: "GQ",
+    name: "QRIS Gudang Voucher",
+    description: "Pembayaran QRIS Gudang Voucher",
+    category: "qris",
+  },
+  {
+    code: "SQ",
+    name: "QRIS Nusapay",
+    description: "Pembayaran QRIS Nusapay",
+    category: "qris",
+  },
+  {
+    code: "OV",
+    name: "OVO",
+    description: "Pembayaran melalui aplikasi OVO",
+    category: "e-wallet",
+  },
+  {
+    code: "DA",
+    name: "DANA",
+    description: "Pembayaran melalui aplikasi DANA",
+    category: "e-wallet",
+  },
+  {
+    code: "LA",
+    name: "LinkAja",
+    description: "Pembayaran melalui aplikasi LinkAja",
+    category: "e-wallet",
+  },
+  {
+    code: "SA",
+    name: "ShopeePay",
+    description: "Pembayaran melalui aplikasi ShopeePay",
+    category: "e-wallet",
+  },
+  {
+    code: "FT",
+    name: "Alfamart",
+    description: "Pembayaran tunai melalui gerai Alfamart",
+    category: "retail",
   },
 ];
 
