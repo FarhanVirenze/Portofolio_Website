@@ -6,11 +6,10 @@ export const size = { width: 256, height: 256 };
 export const contentType = 'image/png';
 
 export default async function Icon() {
-  // Read the original JPG image
-  const imagePath = path.join(process.cwd(), 'public/img/farhan.JPG');
+  const imagePath = path.join(process.cwd(), 'public/img/farhan.png');
   const imageData = await fs.readFile(imagePath);
   const base64Image = imageData.toString('base64');
-  const imgSrc = `data:image/jpeg;base64,${base64Image}`;
+  const imgSrc = `data:image/png;base64,${base64Image}`;
 
   return new ImageResponse(
     (

@@ -209,52 +209,29 @@ function RegisterPageInner() {
         </motion.div>
       </div>
 
-      {/* Right Panel - Decorative */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-primary/5" />
-
+      {/* Right Panel - Photo */}
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden bg-gradient-to-br from-indigo-500/5 via-background to-primary/5">
         <div className="absolute top-[15%] right-[10%] w-[28rem] h-[28rem] bg-indigo-500/15 rounded-full blur-[100px] animate-pulse-glow" />
         <div className="absolute bottom-[15%] left-[10%] w-[24rem] h-[24rem] bg-primary/10 rounded-full blur-[80px] animate-float" style={{ animationDelay: "1s" }} />
-        <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[20rem] h-[20rem] bg-violet-500/8 rounded-full blur-[60px] animate-float" style={{ animationDelay: "2s" }} />
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative z-10 text-center px-12"
+          className="relative z-10 flex flex-col items-center"
         >
-          <h2 className="text-4xl font-bold tracking-tight mb-4">
-            <span className="bg-gradient-to-r from-indigo-500 via-primary to-violet-500 bg-clip-text text-transparent">
-              Mulai Sekarang
-            </span>
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-md">
-            Buat akun baru dan nikmati semua fitur yang tersedia.
-          </p>
-
-          <div className="mt-10 grid grid-cols-3 gap-4 max-w-sm mx-auto">
-            <div className="backdrop-blur-sm bg-card/40 border border-border/30 rounded-2xl p-4 animate-float" style={{ animationDelay: "0s" }}>
-              <div className="w-10 h-10 mx-auto rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                </svg>
-              </div>
-            </div>
-            <div className="backdrop-blur-sm bg-card/40 border border-border/30 rounded-2xl p-4 animate-float" style={{ animationDelay: "0.5s" }}>
-              <div className="w-10 h-10 mx-auto rounded-xl bg-primary/10 flex items-center justify-center">
-                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-              </div>
-            </div>
-            <div className="backdrop-blur-sm bg-card/40 border border-border/30 rounded-2xl p-4 animate-float" style={{ animationDelay: "1s" }}>
-              <div className="w-10 h-10 mx-auto rounded-xl bg-violet-500/10 flex items-center justify-center">
-                <svg className="w-5 h-5 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-            </div>
+          <div className="relative">
+            <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/20 to-primary/20 rounded-full blur-2xl animate-pulse-glow" />
+            <img
+              src="/img/farhan.png"
+              alt="Farhan"
+              className="relative w-72 h-72 object-cover rounded-full border-4 border-border/50 shadow-2xl shadow-primary/20"
+            />
           </div>
+          <h2 className="mt-8 text-3xl font-bold tracking-tight">
+            <span className="bg-gradient-to-r from-indigo-500 to-primary bg-clip-text text-transparent">Farhan</span>
+          </h2>
+          <p className="mt-2 text-muted-foreground">Full Stack Developer</p>
         </motion.div>
       </div>
     </div>
