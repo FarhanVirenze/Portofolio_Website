@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Clock, ExternalLink, ReceiptText, ShieldCheck } from "lucide-react";
+import { PaymentInstructions } from "@/components/payment-instructions";
+import { parseDuitkuResponse } from "@/lib/duitku";
 import { getServiceSupabase } from "@/lib/supabase";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { formatRupiah } from "@/lib/store";
+import { findPaymentMethod, formatRupiah } from "@/lib/store";
 
 type PaymentPageProps = {
   searchParams: Promise<{
@@ -18,6 +20,7 @@ type PaymentOrder = {
   amount: number;
   status: string;
   payment_url: string | null;
+  raw_response: unknown;
   expires_at: string | null;
   created_at: string;
 };
@@ -70,7 +73,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
   const supabase = getServiceSupabase();
   const { data: order, error } = await supabase
     .from("checkout_transactions")
-    .select("merchant_order_id, product_name, payment_method, amount, status, payment_url, expires_at, created_at")
+    .select("merchant_order_id, product_name, payment_method, amount, status, payment_url, raw_response, expires_at, created_at")
     .eq("merchant_order_id", merchantOrderId)
     .eq("user_id", user.id)
     .single<PaymentOrder>();
@@ -81,6 +84,8 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
 
   const isExpired = isExpiredAt(order.expires_at);
   const canPay = order.status === "pending" && !isExpired && Boolean(order.payment_url);
+  const duitkuData = parseDuitkuResponse(order.raw_response);
+  const paymentMethodName = findPaymentMethod(order.payment_method)?.name ?? order.payment_method;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -101,7 +106,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Halaman Pembayaran</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight">Selesaikan Transaksi</h1>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Instruksi pembayaran Duitku ditampilkan di panel kanan tanpa kembali ke halaman home.
+            Instruksi pembayaran ditampilkan di panel kanan. Halaman Duitku resmi tetap bisa dibuka lewat tombol di bawah.
           </p>
 
           <dl className="mt-8 space-y-3 rounded-2xl border border-border bg-background p-5">
@@ -133,14 +138,13 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
 
         <section className="min-h-[720px] bg-muted/40 p-4 md:p-6 lg:min-h-screen">
           {canPay && order.payment_url ? (
-            <div className="h-[calc(100vh-2rem)] min-h-[680px] overflow-hidden rounded-2xl border border-border bg-white shadow-xl md:h-[calc(100vh-3rem)]">
-              <iframe
-                title={`Pembayaran ${order.merchant_order_id}`}
-                src={order.payment_url}
-                className="h-full w-full border-0 bg-white"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
+            <PaymentInstructions
+              paymentMethod={order.payment_method}
+              paymentMethodName={paymentMethodName}
+              amount={order.amount}
+              paymentUrl={order.payment_url}
+              duitkuData={duitkuData}
+            />
           ) : (
             <div className="flex min-h-[680px] items-center justify-center rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
               <div className="max-w-md">

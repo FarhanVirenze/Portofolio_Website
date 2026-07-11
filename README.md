@@ -16,16 +16,18 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Duitku Sandbox API V2
+## Duitku API V2
 
-Checkout uses Duitku API V2 from a server-side Route Handler. Add these variables to `.env.local` before testing a real sandbox payment:
+Checkout uses Duitku API V2 from a server-side Route Handler. Add these variables to `.env.local` before testing a real payment:
 
 ```bash
 NEXT_PUBLIC_APP_URL=https://xffarhans.my.id
-DUITKU_MODE=sandbox
-DUITKU_MERCHANT_CODE=your_sandbox_merchant_code
-DUITKU_API_KEY=your_sandbox_merchant_key
+DUITKU_MODE=production
+DUITKU_MERCHANT_CODE=your_merchant_code
+DUITKU_API_KEY=your_merchant_key
 ```
+
+Use `DUITKU_MODE=sandbox` only for sandbox credentials and testing.
 
 The callback URL sent to Duitku is `/api/duitku/callback`, and the return URL is `/checkout/return`.
 
