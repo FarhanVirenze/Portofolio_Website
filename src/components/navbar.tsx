@@ -13,7 +13,7 @@ const navLinks = [
   { name: "Home", path: "#hero", icon: Home },
   { name: "About", path: "#about", icon: User },
   { name: "Portofolio", path: "#portfolio", icon: Briefcase },
-  { name: "Produk", path: "#products", icon: ShoppingCart },
+  { name: "Product", path: "#products", icon: ShoppingCart },
   { name: "Certification", path: "#certification", icon: Award },
   { name: "Support", path: "#support", icon: Headphones },
 ];

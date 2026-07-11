@@ -16,7 +16,7 @@ export function StoreSection({ products }: { products: Product[] }) {
               <ShoppingCart className="h-5 w-5 text-primary" />
             </div>
             <h2 className="text-4xl font-medium tracking-tight text-foreground md:text-5xl">
-              Produk digital
+              Product Digital
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
               Paket pengembangan website dan aplikasi untuk membantu usaha tampil rapi, mudah dihubungi, dan siap menerima pembayaran online.
