@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, User, FolderOpen, Award, LayoutDashboard, LogOut, Package, BarChart3 } from "lucide-react";
+import { Home, User, FolderOpen, Award, LayoutDashboard, LogOut, Package, BarChart3, Shield } from "lucide-react";
 import { logoutAction } from "@/app/actions/auth";
 
 const menuItems = [
@@ -13,6 +13,7 @@ const menuItems = [
   { label: "Portfolio", href: "/admin/portofolio", icon: FolderOpen },
   { label: "Certification", href: "/admin/certification", icon: Award },
   { label: "Products", href: "/admin/products", icon: Package },
+  { label: "Admin Settings", href: "/admin/admin-settings", icon: Shield },
 ];
 
 export function AdminSidebar() {
