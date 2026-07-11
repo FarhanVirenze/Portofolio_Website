@@ -8,8 +8,7 @@ type CheckoutRequest = {
   paymentMethod?: string;
 };
 
-const duitkuSandboxInquiryUrl = "https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry";
-const duitkuProductionInquiryUrl = "https://passport.duitku.com/webapi/api/merchant/v2/inquiry";
+const duitkuProductionCreateInvoiceUrl = "https://api-prod.duitku.com/api/merchant/createInvoice";
 
 export const runtime = "nodejs";
 
@@ -21,20 +20,9 @@ function getEnv(name: string) {
   return process.env[name]?.trim();
 }
 
-function getDuitkuDiagnostics(merchantCode: string, inquiryUrl: string, mode: string) {
-  return {
-    mode,
-    inquiryUrl,
-    merchantCode,
-    hasApiKey: Boolean(getEnv("DUITKU_API_KEY")),
-  };
-}
-
-function signInquiry(merchantCode: string, merchantOrderId: string, paymentAmount: number, apiKey: string) {
-  return crypto
-    .createHmac("sha256", apiKey)
-    .update(`${merchantCode}${merchantOrderId}${paymentAmount}`)
-    .digest("hex");
+function signPopHeader(merchantCode: string, timestamp: string, apiKey: string) {
+  const stringToSign = merchantCode + timestamp;
+  return crypto.createHmac("sha256", apiKey).update(stringToSign).digest("hex");
 }
 
 function splitName(name: string) {
@@ -54,7 +42,6 @@ export async function POST(request: Request) {
     const merchantCode = getEnv("DUITKU_MERCHANT_CODE");
     const apiKey = getEnv("DUITKU_API_KEY");
     const duitkuMode = getEnv("DUITKU_MODE") || "sandbox";
-    const configuredInquiryUrl = getEnv("DUITKU_INQUIRY_URL");
 
     if (!merchantCode || !apiKey) {
       return Response.json(
@@ -119,13 +106,17 @@ export async function POST(request: Request) {
 
     const baseUrl = getBaseUrl();
     const merchantOrderId = `XF-${product.id.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12)}-${Date.now()}`;
-    const signature = signInquiry(merchantCode, merchantOrderId, product.price, apiKey);
     const { firstName, lastName } = splitName(customerName);
     const expiryPeriod = 60;
     const expiresAt = getExpiryDate(expiryPeriod);
-    const inquiryUrl =
-      configuredInquiryUrl ||
-      (duitkuMode === "production" ? duitkuProductionInquiryUrl : duitkuSandboxInquiryUrl);
+    const timestamp = String(Date.now());
+
+    const configuredCreateInvoiceUrl = getEnv("DUITKU_CREATE_INVOICE_URL");
+
+    const createInvoiceUrl =
+      configuredCreateInvoiceUrl || duitkuProductionCreateInvoiceUrl;
+
+    const signature = signPopHeader(merchantCode, timestamp, apiKey);
 
     const customerAddress = {
       firstName,
@@ -138,9 +129,7 @@ export async function POST(request: Request) {
     };
 
     const payload = {
-      merchantCode,
       paymentAmount: product.price,
-      paymentMethod: paymentMethod.code,
       merchantOrderId,
       productDetails: product.name,
       additionalParam: product.id,
@@ -165,7 +154,6 @@ export async function POST(request: Request) {
       },
       callbackUrl: `${baseUrl}/api/duitku/callback`,
       returnUrl: `${baseUrl}/checkout/return`,
-      signature,
       expiryPeriod,
     };
 
@@ -189,10 +177,13 @@ export async function POST(request: Request) {
       return Response.json({ message: insertError.message }, { status: 500 });
     }
 
-    const duitkuResponse = await fetch(inquiryUrl, {
+    const duitkuResponse = await fetch(createInvoiceUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-duitku-merchantcode": merchantCode,
+        "x-duitku-timestamp": timestamp,
+        "x-duitku-signature": signature,
       },
       body: JSON.stringify(payload),
     });
@@ -213,7 +204,6 @@ export async function POST(request: Request) {
         {
           message: data?.statusMessage || data?.Message || "Duitku belum bisa membuat transaksi.",
           detail: data,
-          diagnostics: getDuitkuDiagnostics(merchantCode, inquiryUrl, duitkuMode),
         },
         { status: duitkuResponse.status || 502 }
       );
@@ -231,8 +221,6 @@ export async function POST(request: Request) {
 
     return Response.json({
       merchantOrderId,
-      paymentUrl: data.paymentUrl,
-      redirectTo: `/checkout/payment?order=${encodeURIComponent(merchantOrderId)}`,
       reference: data.reference,
       statusCode: data.statusCode,
       statusMessage: data.statusMessage,

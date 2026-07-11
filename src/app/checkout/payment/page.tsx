@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { ExternalLink, ArrowLeft } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { getServiceSupabase } from "@/lib/supabase";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -16,7 +16,6 @@ type PaymentOrder = {
   product_name: string;
   payment_method: string;
   amount: number;
-  status: string;
   payment_url: string | null;
   expires_at: string | null;
 };
@@ -45,7 +44,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
   const supabase = getServiceSupabase();
   const { data: order, error } = await supabase
     .from("checkout_transactions")
-    .select("merchant_order_id, product_name, payment_method, amount, status, payment_url, expires_at")
+    .select("merchant_order_id, product_name, payment_method, amount, payment_url, expires_at")
     .eq("merchant_order_id", merchantOrderId)
     .eq("user_id", user.id)
     .single<PaymentOrder>();
@@ -56,7 +55,7 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
 
   const isExpired = isExpiredAt(order.expires_at);
 
-  if (!order.payment_url || isExpired || order.status !== "pending") {
+  if (!order.payment_url || isExpired) {
     redirect("/orders");
   }
 
@@ -93,6 +92,8 @@ export default async function PaymentPage({ searchParams }: PaymentPageProps) {
 
           <a
             href={order.payment_url}
+            target="_blank"
+            rel="noreferrer"
             className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
           >
             <ExternalLink className="h-4 w-4" />

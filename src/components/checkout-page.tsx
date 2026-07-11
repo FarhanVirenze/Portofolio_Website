@@ -7,6 +7,23 @@ import { Button } from "@/components/ui/button";
 import { PaymentMethodSelect } from "@/components/payment-method-select";
 import { formatRupiah, paymentMethods, products } from "@/lib/store";
 
+declare global {
+  interface Window {
+    checkout?: {
+      process: (
+        reference: string,
+        options: {
+          defaultLanguage?: string;
+          successEvent?: (result: { resultCode: string; merchantOrderId: string; reference: string }) => void;
+          pendingEvent?: (result: { resultCode: string; merchantOrderId: string; reference: string }) => void;
+          errorEvent?: (result: { resultCode: string; merchantOrderId: string; reference: string }) => void;
+          closeEvent?: (result: { resultCode: string; merchantOrderId: string; reference: string }) => void;
+        }
+      ) => void;
+    };
+  }
+}
+
 type CheckoutPageProps = {
   initialProductId?: string;
 };
@@ -54,8 +71,33 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
         throw new Error(data?.message ?? "Checkout belum bisa diproses.");
       }
 
-      if (typeof data.paymentUrl === "string" && data.paymentUrl) {
-        window.location.href = data.paymentUrl;
+      if (typeof data.reference === "string" && data.reference) {
+        if (typeof window.checkout !== "undefined") {
+          window.checkout.process(data.reference, {
+            defaultLanguage: "id",
+            successEvent: (result) => {
+              console.log("Duitku Pop success:", result);
+              window.location.href = `/checkout/return?merchantOrderId=${encodeURIComponent(result.merchantOrderId)}&resultCode=${result.resultCode}&reference=${result.reference}`;
+            },
+            pendingEvent: (result) => {
+              console.log("Duitku Pop pending:", result);
+              window.location.href = `/checkout/return?merchantOrderId=${encodeURIComponent(result.merchantOrderId)}&resultCode=${result.resultCode}&reference=${result.reference}`;
+            },
+            errorEvent: (result) => {
+              console.error("Duitku Pop error:", result);
+              setMessage("Terjadi kesalahan pada pembayaran. Silakan coba lagi.");
+              setIsLoading(false);
+            },
+            closeEvent: (result) => {
+              console.log("Duitku Pop closed:", result);
+              setMessage("Popup pembayaran ditutup. Klik tombol lagi untuk melanjutkan.");
+              setIsLoading(false);
+            },
+          });
+          return;
+        }
+
+        window.location.href = `/checkout/payment?order=${encodeURIComponent(data.merchantOrderId)}`;
         return;
       }
 
@@ -64,15 +106,9 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
         return;
       }
 
-      if (typeof data.redirectTo === "string") {
-        window.location.href = data.redirectTo;
-        return;
-      }
-
-      throw new Error("Gateway pembayaran tidak mengembalikan halaman pembayaran.");
+      throw new Error("Gateway pembayaran tidak mengembalikan referensi transaksi.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Terjadi kesalahan saat checkout.");
-    } finally {
       setIsLoading(false);
     }
   };

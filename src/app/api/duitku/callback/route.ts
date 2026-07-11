@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     return new Response("Failed to update transaction", { status: 500 });
   }
 
-  console.info("Duitku V2 callback received", {
+  console.info("Duitku Pop callback received", {
     merchantCode,
     amount,
     merchantOrderId,
