@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,20 @@ type UserProfile = {
 };
 
 export default function SettingsPage() {
+  return (
+    <Suspense fallback={
+      <section className="relative z-10 flex min-h-screen items-center justify-center bg-background px-6 py-28">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </section>
+    }>
+      <SettingsPageInner />
+    </Suspense>
+  );
+}
+
+function SettingsPageInner() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const [profile, setProfile] = useState<UserProfile>({
     full_name: "",
     email: "",
@@ -85,6 +100,10 @@ export default function SettingsPage() {
     });
     setMessage("Profil berhasil disimpan.");
     setIsSaving(false);
+
+    if (redirectTo) {
+      window.location.href = redirectTo;
+    }
   };
 
   return (
@@ -144,7 +163,7 @@ export default function SettingsPage() {
                 Simpan
               </Button>
               <Link
-                href="/#products"
+                href={redirectTo || "/#products"}
                 className="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-border px-4 text-sm font-medium transition-colors hover:bg-muted"
               >
                 Kembali Checkout

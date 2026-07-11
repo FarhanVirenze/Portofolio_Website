@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState, type FormEvent } from "react";
 import { Loader2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
-export default function RegisterPage() {
+function RegisterPageInner() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/";
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -61,7 +64,7 @@ export default function RegisterPage() {
       return;
     }
 
-    window.location.href = "/";
+    window.location.href = redirectTo;
   };
 
   return (
@@ -118,5 +121,17 @@ export default function RegisterPage() {
         </p>
       </div>
     </section>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <section className="relative z-10 flex min-h-screen items-center justify-center bg-background px-6 py-28">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </section>
+    }>
+      <RegisterPageInner />
+    </Suspense>
   );
 }

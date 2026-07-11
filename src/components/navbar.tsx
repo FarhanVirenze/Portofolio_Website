@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { Award, Briefcase, Headphones, History, Home, LogOut, Settings, ShoppingCart, User } from "lucide-react";
+import { Award, Briefcase, Headphones, History, Home, LogOut, Settings, ShoppingCart, User, AlertCircle } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const navLinks = [
@@ -22,6 +22,7 @@ export function Navbar() {
   const [activeSection, setActiveSection] = useState("#hero");
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profileIncomplete, setProfileIncomplete] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,6 +47,27 @@ export function Navbar() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setProfileIncomplete(false);
+      return;
+    }
+
+    fetch("/api/user/profile")
+      .then((res) => res.json())
+      .then((data) => {
+        const p = data?.profile;
+        if (!p || !p.full_name || !p.phone || !p.address) {
+          setProfileIncomplete(true);
+        } else {
+          setProfileIncomplete(false);
+        }
+      })
+      .catch(() => {
+        setProfileIncomplete(true);
+      });
+  }, [user]);
 
   useEffect(() => {
     // Intersection Observer to detect active section
@@ -152,7 +174,7 @@ export function Navbar() {
 
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              <UserMenu user={user} displayName={displayName} initials={initials} onLogout={handleLogout} />
+              <UserMenu user={user} displayName={displayName} initials={initials} onLogout={handleLogout} profileIncomplete={profileIncomplete} />
             </div>
           </div>
         </div>
@@ -168,7 +190,7 @@ export function Navbar() {
           Farhan();
         </a>
         <div className="flex items-center gap-2">
-          <UserMenu user={user} displayName={displayName} initials={initials} onLogout={handleLogout} compact />
+          <UserMenu user={user} displayName={displayName} initials={initials} onLogout={handleLogout} profileIncomplete={profileIncomplete} compact />
           <ThemeToggle />
         </div>
       </div>
@@ -221,12 +243,14 @@ function UserMenu({
   displayName,
   initials,
   onLogout,
+  profileIncomplete,
   compact = false,
 }: {
   user: SupabaseUser | null;
   displayName: string;
   initials: string;
   onLogout: () => Promise<void>;
+  profileIncomplete?: boolean;
   compact?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -286,7 +310,7 @@ function UserMenu({
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-border bg-muted text-sm font-semibold text-foreground outline-none transition-transform hover:scale-105 focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-border bg-muted text-sm font-semibold text-foreground outline-none transition-transform hover:scale-105 focus-visible:ring-3 focus-visible:ring-ring/50"
         aria-label="Buka menu profile"
         aria-expanded={isOpen}
       >
@@ -299,6 +323,11 @@ function UserMenu({
         ) : (
           <span>{initials || "U"}</span>
         )}
+        {profileIncomplete && (
+          <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-red-500">
+            <AlertCircle className="h-2.5 w-2.5 text-white" />
+          </span>
+        )}
       </button>
 
       {isOpen && (
@@ -306,6 +335,9 @@ function UserMenu({
           <div className="px-3 py-2">
             <p className="truncate text-sm font-semibold text-foreground">{displayName}</p>
             <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+            {profileIncomplete && (
+              <p className="mt-1 text-xs text-red-500">Profil belum lengkap</p>
+            )}
           </div>
           <div className="my-1 h-px bg-border" />
           <Link

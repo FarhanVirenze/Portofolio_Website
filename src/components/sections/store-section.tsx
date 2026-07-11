@@ -1,11 +1,47 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Check, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatRupiah, products } from "@/lib/store";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+
+function getBuyHref(productId: string, authChecked: boolean, isLoggedIn: boolean, profileIncomplete: boolean) {
+  if (!authChecked) return "#";
+  if (!isLoggedIn) return `/login?redirect=${encodeURIComponent(`/checkout?product=${productId}`)}`;
+  if (profileIncomplete) return `/settings?redirect=${encodeURIComponent(`/checkout?product=${productId}`)}`;
+  return `/checkout?product=${productId}`;
+}
 
 export function StoreSection() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [profileIncomplete, setProfileIncomplete] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) {
+        setAuthChecked(true);
+        return;
+      }
+
+      setIsLoggedIn(true);
+
+      fetch("/api/user/profile")
+        .then((res) => res.json())
+        .then((data) => {
+          const p = data?.profile;
+          if (!p || !p.full_name || !p.phone || !p.address) {
+            setProfileIncomplete(true);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setAuthChecked(true));
+    });
+  }, []);
   return (
     <section id="products" className="relative z-10 w-full bg-background py-24">
       <div className="w-full px-6 md:px-10 lg:px-16">
@@ -62,7 +98,7 @@ export function StoreSection() {
               </div>
 
               <Link
-                href={`/checkout?product=${product.id}`}
+                href={getBuyHref(product.id, authChecked, isLoggedIn, profileIncomplete)}
                 className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
               >
                 <ShoppingCart className="h-4 w-4" />

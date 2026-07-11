@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type FormEvent } from "react";
-import { ArrowLeft, CheckCircle2, Loader2, Package, ShieldCheck, ShoppingCart } from "lucide-react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { AlertCircle, ArrowLeft, CheckCircle2, Loader2, Package, ShieldCheck, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaymentMethodSelect } from "@/components/payment-method-select";
 import { formatRupiah, paymentMethods, products } from "@/lib/store";
@@ -34,6 +34,24 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
   const [paymentMethod, setPaymentMethod] = useState(paymentMethods[0]?.code ?? "VC");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [profileIncomplete, setProfileIncomplete] = useState(false);
+  const [isCheckingProfile, setIsCheckingProfile] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/user/profile")
+      .then((res) => {
+        if (!res.ok) throw new Error("not logged in");
+        return res.json();
+      })
+      .then((data) => {
+        const p = data?.profile;
+        if (!p || !p.full_name || !p.phone || !p.address) {
+          setProfileIncomplete(true);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsCheckingProfile(false));
+  }, []);
 
   const selectedProduct = useMemo(
     () => products.find((product) => product.id === productId) ?? products[0],
@@ -138,6 +156,22 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
             </div>
 
             <form className="space-y-5" onSubmit={submitCheckout}>
+              {profileIncomplete && (
+                <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
+                  <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+                  <div className="flex-1 text-sm">
+                    <p className="font-medium text-red-600 dark:text-red-400">Data checkout belum lengkap</p>
+                    <p className="mt-1 text-red-600/80 dark:text-red-400/80">
+                      Lengkapi nama, telepon, dan alamat di{" "}
+                      <Link href="/settings" className="font-medium underline underline-offset-2 hover:text-red-600 dark:hover:text-red-300">
+                        Settings
+                      </Link>{" "}
+                      sebelum melanjutkan pembayaran.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <label className="block space-y-2 text-sm font-medium text-foreground">
                 Produk
                 <select

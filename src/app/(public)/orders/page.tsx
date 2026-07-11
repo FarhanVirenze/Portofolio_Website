@@ -36,8 +36,8 @@ const statusStyles: Record<string, string> = {
   pending: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300",
   paid: "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
   failed: "border-destructive/20 bg-destructive/10 text-destructive",
-  cancelled: "border-muted bg-muted text-muted-foreground",
-  expired: "border-muted bg-muted text-muted-foreground",
+  cancelled: "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-300",
+  expired: "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-300",
 };
 
 function formatDateTime(value: string | null) {
@@ -121,9 +121,10 @@ export default function OrdersPage() {
       const status = getDisplayStatus(order);
       if (status === "pending") acc.pending += 1;
       if (status === "paid") acc.paid += 1;
+      if (status === "cancelled" || status === "expired") acc.cancelled += 1;
       return acc;
     },
-    { pending: 0, paid: 0 }
+    { pending: 0, paid: 0, cancelled: 0 }
   );
 
   return (
@@ -149,10 +150,11 @@ export default function OrdersPage() {
           </Link>
         </div>
 
-        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
           <SummaryCard label="Total Pesanan" value={orders.length} />
           <SummaryCard label="Pending" value={summary.pending} />
           <SummaryCard label="Dibayar" value={summary.paid} />
+          <SummaryCard label="Dibatalkan" value={summary.cancelled} />
         </div>
 
         {isLoading && (
