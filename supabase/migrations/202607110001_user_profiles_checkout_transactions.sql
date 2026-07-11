@@ -14,6 +14,7 @@ create table if not exists public.checkout_transactions (
   user_id uuid not null references auth.users(id) on delete cascade,
   merchant_order_id text not null unique,
   duitku_reference text,
+  payment_url text,
   product_id text not null,
   product_name text not null,
   payment_method text not null,
@@ -28,6 +29,7 @@ create table if not exists public.checkout_transactions (
   raw_response jsonb,
   raw_callback jsonb,
   paid_at timestamptz,
+  expires_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

@@ -21,7 +21,7 @@ export const products: Product[] = [
     shortName: "Landing Page",
     description:
       "Halaman promosi responsif untuk produk, event, atau jasa dengan copywriting ringkas, desain modern, dan optimasi tampilan mobile.",
-    price: 750000,
+    price: 1000,
     timeline: "3-5 hari kerja",
     includes: ["1 halaman utama", "Form kontak", "SEO dasar", "Deploy ke hosting"],
   },
@@ -82,8 +82,8 @@ export const paymentMethods: PaymentMethod[] = [
 
 export const supportContact = {
   email: "farhanvirenze18@gmail.com",
-  phone: "+62 812-3456-7890",
-  address: "Jl. Brawijaya, Tamantirto, Kasihan, Bantul, DI Yogyakarta 55183",
+  phone: "+62 878-1718-4079",
+  address: "Jl. Patriot Bangsa, Tamantirto, Kasihan, Bantul, Daerah Istimewa Yogyakarta",
 };
 
 export function formatRupiah(value: number) {

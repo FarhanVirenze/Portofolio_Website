@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+const SPLASH_SESSION_KEY = "farhan_splash_seen";
+
 interface LoadingContextType {
   isLoaded: boolean;
   setIsLoaded: (loaded: boolean) => void;
@@ -17,7 +19,10 @@ export function useLoading() {
 }
 
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.sessionStorage.getItem(SPLASH_SESSION_KEY) === "true";
+  });
 
   useEffect(() => {
     // Prevent scrolling while loading

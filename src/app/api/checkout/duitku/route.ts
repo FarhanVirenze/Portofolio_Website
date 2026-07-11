@@ -45,6 +45,10 @@ function splitName(name: string) {
   return { firstName, lastName };
 }
 
+function getExpiryDate(expiryPeriodMinutes: number) {
+  return new Date(Date.now() + expiryPeriodMinutes * 60 * 1000);
+}
+
 export async function POST(request: Request) {
   try {
     const merchantCode = getEnv("DUITKU_MERCHANT_CODE");
@@ -117,6 +121,8 @@ export async function POST(request: Request) {
     const merchantOrderId = `XF-${product.id.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12)}-${Date.now()}`;
     const signature = signInquiry(merchantCode, merchantOrderId, product.price, apiKey);
     const { firstName, lastName } = splitName(customerName);
+    const expiryPeriod = 60;
+    const expiresAt = getExpiryDate(expiryPeriod);
     const inquiryUrl =
       configuredInquiryUrl ||
       (duitkuMode === "production" ? duitkuProductionInquiryUrl : duitkuSandboxInquiryUrl);
@@ -160,7 +166,7 @@ export async function POST(request: Request) {
       callbackUrl: `${baseUrl}/api/duitku/callback`,
       returnUrl: `${baseUrl}/checkout/return`,
       signature,
-      expiryPeriod: 60,
+      expiryPeriod,
     };
 
     const { error: insertError } = await serviceSupabase.from("checkout_transactions").insert({
@@ -176,6 +182,7 @@ export async function POST(request: Request) {
       phone,
       billing_address: address,
       raw_request: payload,
+      expires_at: expiresAt.toISOString(),
     });
 
     if (insertError) {
@@ -216,6 +223,7 @@ export async function POST(request: Request) {
       .from("checkout_transactions")
       .update({
         duitku_reference: data.reference ?? null,
+        payment_url: data.paymentUrl ?? null,
         result_code: data.statusCode ?? null,
         raw_response: data,
       })

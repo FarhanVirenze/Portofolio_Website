@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { Award, Briefcase, Headphones, Home, LogOut, Settings, ShoppingCart, User } from "lucide-react";
+import { Award, Briefcase, Headphones, History, Home, LogOut, Settings, ShoppingCart, User } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const navLinks = [
@@ -271,13 +271,29 @@ function UserMenu({
           <span className="block truncate text-xs font-normal">{user.email}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link href="/settings" className="flex w-full items-center gap-2">
+        <DropdownMenuItem
+          render={
+            <Link href="/orders" className="flex w-full items-center gap-2" />
+          }
+        >
+            <History className="h-4 w-4" />
+            History Pesanan
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          render={
+            <Link href="/settings" className="flex w-full items-center gap-2" />
+          }
+        >
             <Settings className="h-4 w-4" />
             Settings
-          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem variant="destructive" onClick={onLogout}>
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={(event) => {
+            event.preventDefault();
+            onLogout();
+          }}
+        >
           <LogOut className="h-4 w-4" />
           Logout
         </DropdownMenuItem>

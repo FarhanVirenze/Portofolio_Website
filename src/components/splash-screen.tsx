@@ -1,23 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useLoading } from "./loading-provider";
-import { useTheme } from "next-themes";
+
+const SPLASH_SESSION_KEY = "farhan_splash_seen";
 
 export function SplashScreen() {
   const textRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const { isLoaded, setIsLoaded } = useLoading();
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted || isLoaded || !overlayRef.current || !textRef.current || !progressRef.current) return;
+    if (isLoaded || !overlayRef.current || !textRef.current || !progressRef.current) return;
 
     // Highly polished GSAP typographic animation
     const words = [
@@ -36,6 +32,7 @@ export function SplashScreen() {
 
     const tl = gsap.timeline({
       onComplete: () => {
+        window.sessionStorage.setItem(SPLASH_SESSION_KEY, "true");
         setIsLoaded(true); // Signal the app to start
       }
     });
@@ -88,7 +85,7 @@ export function SplashScreen() {
     return () => {
       tl.kill();
     };
-  }, [mounted, isLoaded, setIsLoaded]);
+  }, [isLoaded, setIsLoaded]);
 
   return (
     <div 
@@ -115,4 +112,3 @@ export function SplashScreen() {
     </div>
   );
 }
-
