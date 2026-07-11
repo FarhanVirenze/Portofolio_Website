@@ -76,7 +76,7 @@ export default async function CheckoutReturnPage({ searchParams }: CheckoutRetur
   const StatusIcon = status.icon;
 
   return (
-    <main className="min-h-screen bg-background px-6 py-24 text-foreground md:px-10 lg:px-16">
+    <div className="flex min-h-screen items-center justify-center px-6 py-24 text-foreground md:px-10 lg:px-16">
       <div className="mx-auto flex max-w-2xl flex-col items-center rounded-2xl border border-border bg-card p-8 text-center shadow-sm md:p-10">
         <div className={`mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted ${status.tone}`}>
           <StatusIcon className="h-8 w-8" />
@@ -103,6 +103,6 @@ export default async function CheckoutReturnPage({ searchParams }: CheckoutRetur
           Kembali ke Produk
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

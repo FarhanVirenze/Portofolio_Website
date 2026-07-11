@@ -102,13 +102,13 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
         throw new Error(data?.message ?? "Checkout belum bisa diproses.");
       }
 
-      if (typeof data.redirectTo === "string") {
-        window.location.href = data.redirectTo;
+      if (typeof data.paymentUrl === "string" && data.paymentUrl) {
+        window.location.href = data.paymentUrl;
         return;
       }
 
-      if (typeof data.merchantOrderId === "string") {
-        window.location.href = `/checkout/payment?order=${encodeURIComponent(data.merchantOrderId)}`;
+      if (typeof data.redirectTo === "string") {
+        window.location.href = data.redirectTo;
         return;
       }
 
