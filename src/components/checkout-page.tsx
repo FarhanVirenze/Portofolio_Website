@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AlertCircle, ArrowLeft, CheckCircle2, Loader2, Package, ShieldCheck, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PaymentMethodSelect } from "@/components/payment-method-select";
-import { formatRupiah, paymentMethods, products } from "@/lib/store";
+import { formatRupiah, products } from "@/lib/store";
 
 declare global {
   interface Window {
@@ -31,11 +30,9 @@ type CheckoutPageProps = {
 export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
   const initialProduct = products.find((product) => product.id === initialProductId) ?? products[0];
   const [productId, setProductId] = useState(initialProduct.id);
-  const [paymentMethod, setPaymentMethod] = useState(paymentMethods[0]?.code ?? "VC");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [profileIncomplete, setProfileIncomplete] = useState(false);
-  const [isCheckingProfile, setIsCheckingProfile] = useState(true);
 
   useEffect(() => {
     fetch("/api/user/profile")
@@ -49,18 +46,12 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
           setProfileIncomplete(true);
         }
       })
-      .catch(() => {})
-      .finally(() => setIsCheckingProfile(false));
+      .catch(() => {});
   }, []);
 
   const selectedProduct = useMemo(
     () => products.find((product) => product.id === productId) ?? products[0],
     [productId]
-  );
-
-  const selectedPayment = useMemo(
-    () => paymentMethods.find((method) => method.code === paymentMethod) ?? paymentMethods[0],
-    [paymentMethod]
   );
 
   const submitCheckout = async (event: FormEvent<HTMLFormElement>) => {
@@ -72,10 +63,7 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
       const response = await fetch("/api/checkout/duitku", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId,
-          paymentMethod,
-        }),
+        body: JSON.stringify({ productId }),
       });
 
       const data = await response.json();
@@ -94,20 +82,16 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
           window.checkout.process(data.reference, {
             defaultLanguage: "id",
             successEvent: (result) => {
-              console.log("Duitku Pop success:", result);
               window.location.href = `/checkout/return?merchantOrderId=${encodeURIComponent(result.merchantOrderId)}&resultCode=${result.resultCode}&reference=${result.reference}`;
             },
             pendingEvent: (result) => {
-              console.log("Duitku Pop pending:", result);
               window.location.href = `/checkout/return?merchantOrderId=${encodeURIComponent(result.merchantOrderId)}&resultCode=${result.resultCode}&reference=${result.reference}`;
             },
-            errorEvent: (result) => {
-              console.error("Duitku Pop error:", result);
+            errorEvent: () => {
               setMessage("Terjadi kesalahan pada pembayaran. Silakan coba lagi.");
               setIsLoading(false);
             },
-            closeEvent: (result) => {
-              console.log("Duitku Pop closed:", result);
+            closeEvent: () => {
               setMessage("Popup pembayaran ditutup. Klik tombol lagi untuk melanjutkan.");
               setIsLoading(false);
             },
@@ -115,13 +99,7 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
           return;
         }
 
-        window.location.href = `/checkout/payment?order=${encodeURIComponent(data.merchantOrderId)}`;
-        return;
-      }
-
-      if (typeof data.merchantOrderId === "string") {
-        window.location.href = `/checkout/payment?order=${encodeURIComponent(data.merchantOrderId)}`;
-        return;
+        throw new Error("Duitku Pop tidak tersedia. Silakan coba lagi.");
       }
 
       throw new Error("Gateway pembayaran tidak mengembalikan referensi transaksi.");
@@ -151,7 +129,7 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
               <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Checkout</p>
               <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">Selesaikan Pembelian</h1>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:mt-3 md:text-base">
-                Pilih produk dan metode pembayaran. Data nama, email, telepon, dan alamat akan otomatis diambil dari profile akun.
+                Pilih produk lalu pilih metode pembayaran langsung di Duitku Pop. Data nama, email, telepon, dan alamat diambil dari profile akun.
               </p>
             </div>
 
@@ -187,23 +165,6 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
                 </select>
               </label>
 
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-foreground">Metode Pembayaran</p>
-                <PaymentMethodSelect
-                  methods={paymentMethods}
-                  value={paymentMethod}
-                  onChange={setPaymentMethod}
-                />
-              </div>
-
-              <div className="rounded-xl border border-border/70 bg-muted/30 p-4 text-sm leading-relaxed text-muted-foreground">
-                Belum lengkap data checkout? Perbarui nama, telepon, dan alamat di{" "}
-                <Link href="/settings" className="font-medium text-primary hover:text-primary/80">
-                  Settings
-                </Link>
-                .
-              </div>
-
               {message && (
                 <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
                   {message}
@@ -212,7 +173,7 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
 
               <Button type="submit" size="lg" className="h-11 w-full gap-2 rounded-xl" disabled={isLoading}>
                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-                Lanjutkan Pembayaran
+                Bayar Sekarang
               </Button>
             </form>
           </div>
@@ -242,8 +203,8 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
 
             <div className="mt-4 rounded-xl border border-border/70 p-3.5 text-sm sm:mt-6 sm:p-4">
               <p className="text-xs uppercase tracking-widest text-muted-foreground">Pembayaran</p>
-              <p className="mt-1 font-medium text-foreground">{selectedPayment?.name}</p>
-              <p className="mt-1 text-muted-foreground">{selectedPayment?.description}</p>
+              <p className="mt-1 font-medium text-foreground">Dipilih di Duitku Pop</p>
+              <p className="mt-1 text-muted-foreground">Pilih metode pembayaran setelah klik Bayar</p>
             </div>
           </aside>
         </div>

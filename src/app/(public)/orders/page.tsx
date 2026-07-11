@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Clock, CreditCard, Loader2, PackageCheck, ReceiptText } from "lucide-react";
+import { Clock, Loader2, PackageCheck, ReceiptText } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatRupiah } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -183,7 +183,6 @@ export default function OrdersPage() {
             {orders.map((order) => {
               const status = getDisplayStatus(order);
               const remainingText = getRemainingText(order.expires_at, status);
-              const canPay = status === "pending" && Boolean(order.payment_url);
 
               return (
                 <article key={order.id} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
@@ -216,18 +215,6 @@ export default function OrdersPage() {
                         <InfoItem label="Expired" value={formatDateTime(order.expires_at)} />
                         <InfoItem label="Reference" value={order.duitku_reference || "-"} />
                       </dl>
-                    </div>
-
-                    <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-                      {canPay && (
-                        <Link
-                          href={`/checkout/payment?order=${encodeURIComponent(order.merchant_order_id)}`}
-                          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
-                        >
-                          <CreditCard className="h-4 w-4" />
-                          Lanjut Bayar
-                        </Link>
-                      )}
                     </div>
                   </div>
                 </article>

@@ -1,11 +1,10 @@
 import crypto from "node:crypto";
 import { getServiceSupabase } from "@/lib/supabase";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { findPaymentMethod, findProduct } from "@/lib/store";
+import { findProduct } from "@/lib/store";
 
 type CheckoutRequest = {
   productId?: string;
-  paymentMethod?: string;
 };
 
 const duitkuProductionCreateInvoiceUrl = "https://api-prod.duitku.com/api/merchant/createInvoice";
@@ -55,14 +54,9 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as CheckoutRequest;
     const product = body.productId ? findProduct(body.productId) : undefined;
-    const paymentMethod = findPaymentMethod(body.paymentMethod || "");
 
     if (!product) {
       return Response.json({ message: "Produk tidak ditemukan." }, { status: 400 });
-    }
-
-    if (!paymentMethod) {
-      return Response.json({ message: "Metode pembayaran tidak valid." }, { status: 400 });
     }
 
     const authSupabase = await createSupabaseServerClient();
@@ -162,7 +156,7 @@ export async function POST(request: Request) {
       merchant_order_id: merchantOrderId,
       product_id: product.id,
       product_name: product.name,
-      payment_method: paymentMethod.code,
+      payment_method: "POP",
       amount: product.price,
       status: "pending",
       customer_name: customerName,
