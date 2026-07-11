@@ -2,51 +2,14 @@
 
 import Link from "next/link";
 import { useMemo, useState, type FormEvent } from "react";
-import {
-  ArrowLeft,
-  Building2,
-  CheckCircle2,
-  CreditCard,
-  Loader2,
-  Package,
-  QrCode,
-  ShieldCheck,
-  ShoppingCart,
-  Store,
-  WalletCards,
-} from "lucide-react";
+import { ArrowLeft, CheckCircle2, Loader2, Package, ShieldCheck, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatRupiah, paymentMethods, products, type PaymentMethod } from "@/lib/store";
-import { cn } from "@/lib/utils";
+import { PaymentMethodSelect } from "@/components/payment-method-select";
+import { formatRupiah, paymentMethods, products } from "@/lib/store";
 
 type CheckoutPageProps = {
   initialProductId?: string;
 };
-
-const paymentCategoryOrder: PaymentMethod["category"][] = [
-  "virtual-account",
-  "qris",
-  "e-wallet",
-  "retail",
-  "card",
-];
-
-const paymentCategoryLabels: Record<PaymentMethod["category"], string> = {
-  card: "Kartu",
-  "virtual-account": "Virtual Account",
-  qris: "QRIS",
-  "e-wallet": "E-Wallet",
-  retail: "Retail",
-};
-
-function getPaymentIcon(category: PaymentMethod["category"]) {
-  if (category === "card") return CreditCard;
-  if (category === "qris") return QrCode;
-  if (category === "e-wallet") return WalletCards;
-  if (category === "retail") return Store;
-
-  return Building2;
-}
 
 export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
   const initialProduct = products.find((product) => product.id === initialProductId) ?? products[0];
@@ -63,17 +26,6 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
   const selectedPayment = useMemo(
     () => paymentMethods.find((method) => method.code === paymentMethod) ?? paymentMethods[0],
     [paymentMethod]
-  );
-
-  const paymentGroups = useMemo(
-    () =>
-      paymentCategoryOrder
-        .map((category) => ({
-          category,
-          methods: paymentMethods.filter((method) => method.category === category),
-        }))
-        .filter((group) => group.methods.length > 0),
-    []
   );
 
   const submitCheckout = async (event: FormEvent<HTMLFormElement>) => {
@@ -102,8 +54,8 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
         throw new Error(data?.message ?? "Checkout belum bisa diproses.");
       }
 
-      if (typeof data.paymentUrl === "string" && data.paymentUrl) {
-        window.location.href = data.paymentUrl;
+      if (typeof data.merchantOrderId === "string") {
+        window.location.href = `/checkout/payment?order=${encodeURIComponent(data.merchantOrderId)}`;
         return;
       }
 
@@ -121,25 +73,25 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
   };
 
   return (
-    <section className="relative z-10 min-h-screen bg-background px-6 py-28 text-foreground md:px-10 lg:px-16">
+    <section className="relative z-10 min-h-screen bg-background px-4 py-10 text-foreground sm:px-6 md:px-10 md:py-16 lg:px-16 lg:py-20">
       <div className="mx-auto max-w-6xl">
         <Link
           href="/#products"
-          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
           Kembali ke produk
         </Link>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_0.85fr]">
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm md:p-8">
-            <div className="mb-8">
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
-                <ShoppingCart className="h-5 w-5 text-primary" />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_0.85fr] lg:gap-8">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6 md:p-8">
+            <div className="mb-6 md:mb-8">
+              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 md:mb-4 md:h-10 md:w-10">
+                <ShoppingCart className="h-4 w-4 text-primary md:h-5 md:w-5" />
               </div>
               <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Checkout</p>
-              <h1 className="mt-2 text-4xl font-semibold tracking-tight md:text-5xl">Selesaikan Pembelian</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">Selesaikan Pembelian</h1>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:mt-3 md:text-base">
                 Pilih produk dan metode pembayaran. Data nama, email, telepon, dan alamat akan otomatis diambil dari profile akun.
               </p>
             </div>
@@ -160,62 +112,13 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
                 </select>
               </label>
 
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Metode Pembayaran</p>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    API V2 perlu memilih satu channel pembayaran. Pilih channel yang sudah aktif di merchant Duitku kamu.
-                  </p>
-                </div>
-
-                <div className="space-y-5">
-                  {paymentGroups.map((group) => (
-                    <div key={group.category} className="space-y-2">
-                      <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                        {paymentCategoryLabels[group.category]}
-                      </p>
-                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        {group.methods.map((method) => {
-                          const PaymentIcon = getPaymentIcon(method.category);
-                          const isSelected = paymentMethod === method.code;
-
-                          return (
-                            <button
-                              key={method.code}
-                              type="button"
-                              aria-pressed={isSelected}
-                              onClick={() => setPaymentMethod(method.code)}
-                              className={cn(
-                                "flex min-h-20 items-start gap-3 rounded-xl border border-border bg-background p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/5 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/20",
-                                isSelected && "border-primary bg-primary/10 shadow-lg shadow-primary/10"
-                              )}
-                            >
-                              <span
-                                className={cn(
-                                  "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground",
-                                  isSelected && "border-primary/30 bg-primary/15 text-primary"
-                                )}
-                              >
-                                <PaymentIcon className="h-4 w-4" />
-                              </span>
-                              <span className="min-w-0">
-                                <span className="flex items-center gap-2">
-                                  <span className="font-medium text-foreground">{method.name}</span>
-                                  <span className="rounded-md border border-border px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                                    {method.code}
-                                  </span>
-                                </span>
-                                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
-                                  {method.description}
-                                </span>
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-foreground">Metode Pembayaran</p>
+                <PaymentMethodSelect
+                  methods={paymentMethods}
+                  value={paymentMethod}
+                  onChange={setPaymentMethod}
+                />
               </div>
 
               <div className="rounded-xl border border-border/70 bg-muted/30 p-4 text-sm leading-relaxed text-muted-foreground">
@@ -239,30 +142,30 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
             </form>
           </div>
 
-          <aside className="rounded-2xl border border-border bg-card p-6 shadow-sm md:p-8 lg:sticky lg:top-28 lg:self-start">
+          <aside className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6 md:p-8 lg:sticky lg:top-24 lg:self-start">
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Ringkasan Pesanan</p>
 
-            <div className="mt-6 rounded-xl border border-border/70 bg-muted/20 p-5">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Package className="h-6 w-6" />
+            <div className="mt-4 rounded-xl border border-border/70 bg-muted/20 p-4 sm:mt-6 sm:p-5">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary sm:mb-4 sm:h-12 sm:w-12">
+                <Package className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <h2 className="text-2xl font-semibold tracking-tight">{selectedProduct.name}</h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{selectedProduct.description}</p>
-              <p className="mt-5 text-3xl font-semibold tracking-tight text-primary">
+              <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{selectedProduct.name}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:mt-3">{selectedProduct.description}</p>
+              <p className="mt-4 text-2xl font-semibold tracking-tight text-primary sm:mt-5 sm:text-3xl">
                 {formatRupiah(selectedProduct.price)}
               </p>
             </div>
 
-            <div className="mt-5 space-y-3 text-sm text-muted-foreground">
+            <div className="mt-4 space-y-2 text-sm text-muted-foreground sm:mt-5 sm:space-y-3">
               {selectedProduct.includes.map((item) => (
                 <div key={item} className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
                   <span>{item}</span>
                 </div>
               ))}
             </div>
 
-            <div className="mt-6 rounded-xl border border-border/70 p-4 text-sm">
+            <div className="mt-4 rounded-xl border border-border/70 p-3.5 text-sm sm:mt-6 sm:p-4">
               <p className="text-xs uppercase tracking-widest text-muted-foreground">Pembayaran</p>
               <p className="mt-1 font-medium text-foreground">{selectedPayment?.name}</p>
               <p className="mt-1 text-muted-foreground">{selectedPayment?.description}</p>

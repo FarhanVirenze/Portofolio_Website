@@ -14,8 +14,8 @@ const navLinks = [
   { name: "About", path: "#about", icon: User },
   { name: "Portofolio", path: "#portfolio", icon: Briefcase },
   { name: "Produk", path: "#products", icon: ShoppingCart },
-  { name: "Support", path: "#support", icon: Headphones },
   { name: "Certification", path: "#certification", icon: Award },
+  { name: "Support", path: "#support", icon: Headphones },
 ];
 
 export function Navbar() {
@@ -159,9 +159,18 @@ export function Navbar() {
       </nav>
 
       {/* Mobile Top Right Theme Toggle */}
-      <div className="md:hidden fixed top-4 right-4 z-[60] flex items-center gap-2">
-        <UserMenu user={user} displayName={displayName} initials={initials} onLogout={handleLogout} compact />
-        <ThemeToggle />
+      <div className="md:hidden fixed top-0 left-0 right-0 z-[60] flex items-center justify-between px-4 py-3 bg-background/80 backdrop-blur-xl border-b border-border/50">
+        <a
+          href="#hero"
+          onClick={(e) => handleClick(e, "#hero")}
+          className="text-xl font-semibold font-mono tracking-tight text-primary transition-colors hover:text-primary/80"
+        >
+          Farhan();
+        </a>
+        <div className="flex items-center gap-2">
+          <UserMenu user={user} displayName={displayName} initials={initials} onLogout={handleLogout} compact />
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Mobile Bottom Navigation */}
