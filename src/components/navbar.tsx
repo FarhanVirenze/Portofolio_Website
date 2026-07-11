@@ -76,8 +76,7 @@ export function Navbar() {
         // Special case for portfolio because it pins (starts taking up 100% early)
         // Adjusting thresholds based on what's visible
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.2) {
-             // If a section takes up at least 20% of screen, consider it active
+          if (entry.isIntersecting) {
              setActiveSection(`#${entry.target.id}`);
           }
         });

@@ -33,7 +33,9 @@ export function SupportSection() {
               </span>
             </a>
             <a
-              href={`tel:${supportContact.phone.replace(/[^+\d]/g, "")}`}
+              href="https://wa.me/6287817184079"
+              target="_blank"
+              rel="noreferrer"
               className="flex items-start gap-3 rounded-xl border border-border/70 p-4 text-sm text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
             >
               <Phone className="mt-0.5 h-5 w-5 text-primary" />

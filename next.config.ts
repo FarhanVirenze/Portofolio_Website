@@ -1,12 +1,30 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // To completely disable the dev indicator if needed, you might not be able to do it via config anymore in this version.
-  // The logo only appears in development mode.
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb",
     },
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn-icons-png.flaticon.com",
+      },
+      {
+        protocol: "https",
+        hostname: "git-scm.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.supabase.in",
+      },
+    ],
   },
 };
 

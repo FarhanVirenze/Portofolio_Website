@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { ExternalLink, Calendar, Award, Building2 } from "lucide-react";
 import type { Certification as CertificationType } from "@/lib/types";
+import Image from "next/image";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
@@ -158,10 +159,13 @@ function CertificateCard({ cert }: { cert: CertificationType }) {
         className="relative aspect-[16/10] w-full overflow-hidden bg-muted/30 block"
       >
         {cert.image_url ? (
-          <img
+          <Image
             src={imageUrl}
             alt={cert.title}
+            width={600}
+            height={375}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

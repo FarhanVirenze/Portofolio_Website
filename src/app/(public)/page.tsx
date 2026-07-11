@@ -3,7 +3,7 @@ import { Download } from "lucide-react";
 import { getServiceSupabase } from "@/lib/supabase";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { HomeHero } from "@/components/home-hero";
-import { ThreeJsHero } from "@/components/three-js-hero";
+import { ThreeJsHeroLazy } from "@/components/three-js-hero-lazy";
 import { AboutSection } from "@/components/sections/about-section";
 import { PortfolioSection } from "@/components/sections/portfolio-section";
 import { CertificationSection } from "@/components/sections/certification-section";
@@ -84,7 +84,7 @@ export default async function Home() {
       
       {/* 1. Hero Section */}
       <section id="hero" className="relative w-full overflow-hidden">
-        <ThreeJsHero />
+        <ThreeJsHeroLazy />
         
         {/* Main Hero Content */}
         <div className="relative z-10 w-full pt-24 md:pt-32 min-h-screen flex items-center justify-center px-6 md:px-10 lg:px-16">
@@ -134,6 +134,9 @@ export default async function Home() {
                     <img
                       src={profileImageUrl}
                       alt="Muhamad Farhan"
+                      width={320}
+                      height={320}
+                      loading="eager"
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                     />
                   </div>

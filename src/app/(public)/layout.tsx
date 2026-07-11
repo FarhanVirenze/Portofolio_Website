@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { ParticleBackground } from "@/components/ui/particle-background";
+import { ParticleBackgroundLazy } from "@/components/particle-background-lazy";
 import { GsapProvider } from "@/components/gsap-provider";
 import { LoadingProvider } from "@/components/loading-provider";
 
@@ -12,7 +12,7 @@ export default function PublicLayout({
   return (
     <LoadingProvider>
       <GsapProvider>
-        <ParticleBackground />
+        <ParticleBackgroundLazy />
         <Navbar />
         <main className="flex-1 w-full">
           {children}

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { Project } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import Image from "next/image";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
@@ -163,10 +164,13 @@ export function PortfolioSection({ projects }: { projects: Project[] }) {
             >
               {/* Image */}
               <div className="relative flex-[3] w-full overflow-hidden bg-muted/20">
-                <img
+                <Image
                   src={imageUrl}
                   alt={project.title}
+                  width={1200}
+                  height={800}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  unoptimized
                 />
                 {/* Floating buttons */}
                 <div className="absolute top-4 right-4 flex items-center gap-2 opacity-100 md:opacity-0 md:-translate-y-3 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-500">

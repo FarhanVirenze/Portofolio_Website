@@ -2,6 +2,7 @@ import { Skill } from "@/lib/types";
 import { Code, Sparkles } from "lucide-react";
 import { AboutSections } from "@/components/about-sections";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import Image from "next/image";
 
 interface AboutSectionProps {
   skills: Skill[];
@@ -37,9 +38,11 @@ export function AboutSection({ skills, bioParagraphs, profileImageUrl }: AboutSe
                 <div className="lg:col-span-5 group about-profile-card opacity-0">
                   <div className="relative h-full min-h-[400px] lg:min-h-[500px] rounded-3xl overflow-hidden border border-border bg-card shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
                     <div className="absolute inset-0">
-                      <img 
+                      <Image 
                         src={profileImageUrl} 
                         alt="Muhamad Farhan" 
+                        width={500}
+                        height={500}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                       {/* Gradient overlay */}
@@ -90,11 +93,14 @@ export function AboutSection({ skills, bioParagraphs, profileImageUrl }: AboutSe
                 <div className="flex w-max animate-marquee hover:[animation-play-state:paused] items-center">
                   {[...techSkills, ...techSkills, ...techSkills, ...techSkills].map((skill, index) => (
                     <div key={`tech-${index}`} className="flex items-center justify-center px-8 md:px-12 group cursor-pointer">
-                      <img 
+                      <Image 
                         src={skill.icon_url || "/favicon.ico"} 
                         alt={skill.name} 
                         title={skill.name}
-                        className="w-12 h-12 md:w-16 md:h-16 object-contain grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-125 transition-all duration-300 drop-shadow-md group-hover:drop-shadow-xl" 
+                        width={64}
+                        height={64}
+                        className="w-12 h-12 md:w-16 md:h-16 object-contain grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-125 transition-all duration-300 drop-shadow-md group-hover:drop-shadow-xl"
+                        unoptimized
                       />
                     </div>
                   ))}
@@ -104,11 +110,14 @@ export function AboutSection({ skills, bioParagraphs, profileImageUrl }: AboutSe
                 <div className="flex w-max animate-marquee-reverse hover:[animation-play-state:paused] items-center">
                   {[...toolSkills, ...toolSkills, ...toolSkills, ...toolSkills].map((skill, index) => (
                     <div key={`tool-${index}`} className="flex items-center justify-center px-8 md:px-12 group cursor-pointer">
-                      <img 
+                      <Image 
                         src={skill.icon_url || "/favicon.ico"} 
                         alt={skill.name} 
                         title={skill.name}
-                        className="w-12 h-12 md:w-16 md:h-16 object-contain grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-125 transition-all duration-300 drop-shadow-md group-hover:drop-shadow-xl" 
+                        width={64}
+                        height={64}
+                        className="w-12 h-12 md:w-16 md:h-16 object-contain grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-125 transition-all duration-300 drop-shadow-md group-hover:drop-shadow-xl"
+                        unoptimized
                       />
                     </div>
                   ))}
