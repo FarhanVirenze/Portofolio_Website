@@ -1,7 +1,6 @@
 import crypto from "node:crypto";
 import { getServiceSupabase } from "@/lib/supabase";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { findProduct } from "@/lib/store";
 
 type CheckoutRequest = {
   productId?: string;
@@ -53,7 +52,14 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as CheckoutRequest;
-    const product = body.productId ? findProduct(body.productId) : undefined;
+
+    const supabase = getServiceSupabase();
+    const { data: product, error: productError } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", body.productId)
+      .eq("is_active", true)
+      .single();
 
     if (!product) {
       return Response.json({ message: "Produk tidak ditemukan." }, { status: 400 });
@@ -72,8 +78,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const serviceSupabase = getServiceSupabase();
-    const { data: profile, error: profileError } = await serviceSupabase
+    const { data: profile, error: profileError } = await supabase
       .from("user_profiles")
       .select("full_name, email, phone, address")
       .eq("id", user.id)
@@ -133,7 +138,7 @@ export async function POST(request: Request) {
       phoneNumber: phone,
       itemDetails: [
         {
-          name: product.shortName.slice(0, 50),
+          name: product.short_name.slice(0, 50),
           price: product.price,
           quantity: 1,
         },
@@ -151,7 +156,7 @@ export async function POST(request: Request) {
       expiryPeriod,
     };
 
-    const { error: insertError } = await serviceSupabase.from("checkout_transactions").insert({
+    const { error: insertError } = await supabase.from("checkout_transactions").insert({
       user_id: user.id,
       merchant_order_id: merchantOrderId,
       product_id: product.id,
@@ -185,7 +190,7 @@ export async function POST(request: Request) {
     const data = await duitkuResponse.json().catch(() => null);
 
     if (!duitkuResponse.ok || data?.statusCode !== "00") {
-      await serviceSupabase
+      await supabase
         .from("checkout_transactions")
         .update({
           status: "failed",
@@ -203,7 +208,7 @@ export async function POST(request: Request) {
       );
     }
 
-    await serviceSupabase
+    await supabase
       .from("checkout_transactions")
       .update({
         duitku_reference: data.reference ?? null,

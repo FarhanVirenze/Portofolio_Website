@@ -26,14 +26,7 @@ export async function loginAction(prevState: any, formData: FormData) {
       .single();
     
     if (data) {
-      // Support both plaintext and bcrypt-hashed passwords
-      if (data.password.startsWith("$2")) {
-        // Hashed with bcrypt
-        isValidUser = await bcrypt.compare(password, data.password);
-      } else {
-        // Plaintext fallback
-        isValidUser = data.password === password;
-      }
+      isValidUser = await bcrypt.compare(password, data.password);
     }
   } else {
     const validEmail = process.env.ADMIN_EMAIL || "admin@admin.com";

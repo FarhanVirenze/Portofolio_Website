@@ -10,6 +10,7 @@ import { CertificationSection } from "@/components/sections/certification-sectio
 import { StoreSection } from "@/components/sections/store-section";
 import { SupportSection } from "@/components/sections/support-section";
 import { Skill, Project, Certification } from "@/lib/types";
+import type { Product } from "@/lib/store";
 
 export default async function Home() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -35,6 +36,7 @@ export default async function Home() {
   ];
   let projects: Project[] = [];
   let certifications: Certification[] = [];
+  let products: Product[] = [];
 
   if (isSupabaseConfigured) {
     const supabase = getServiceSupabase();
@@ -69,6 +71,10 @@ export default async function Home() {
     // Fetch Certifications
     const certRes = await supabase.from("certifications").select("*").order("sort_order");
     if (certRes.data) certifications = certRes.data;
+
+    // Fetch Products
+    const prodRes = await supabase.from("products").select("*").eq("is_active", true).order("sort_order");
+    if (prodRes.data) products = prodRes.data;
   }
 
   // Fallback for skills if empty
@@ -158,7 +164,7 @@ export default async function Home() {
       <PortfolioSection projects={projects} />
 
       {/* 4. Product Section */}
-      <StoreSection />
+      <StoreSection products={products} />
 
       {/* 5. Certification Section */}
       <CertificationSection certifications={certifications} />

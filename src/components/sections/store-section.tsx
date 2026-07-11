@@ -2,10 +2,11 @@
 
 import { Check, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatRupiah, products } from "@/lib/store";
+import { formatRupiah } from "@/lib/store";
 import { BuyButton } from "@/components/buy-button";
+import type { Product } from "@/lib/store";
 
-export function StoreSection() {
+export function StoreSection({ products }: { products: Product[] }) {
   return (
     <section id="products" className="relative z-10 w-full bg-background py-24">
       <div className="w-full px-6 md:px-10 lg:px-16">
