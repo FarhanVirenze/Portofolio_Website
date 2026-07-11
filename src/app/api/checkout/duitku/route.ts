@@ -232,6 +232,7 @@ export async function POST(request: Request) {
     return Response.json({
       merchantOrderId,
       paymentUrl: data.paymentUrl,
+      redirectTo: `/checkout/payment?order=${encodeURIComponent(merchantOrderId)}`,
       reference: data.reference,
       statusCode: data.statusCode,
       statusMessage: data.statusMessage,

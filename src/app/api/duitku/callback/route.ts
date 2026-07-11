@@ -3,8 +3,26 @@ import { getServiceSupabase } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 
-function signCallback(merchantCode: string, amount: string, merchantOrderId: string, apiKey: string) {
+function signCallbackHmac(merchantCode: string, amount: string, merchantOrderId: string, apiKey: string) {
   return crypto.createHmac("sha256", apiKey).update(`${merchantCode}${amount}${merchantOrderId}`).digest("hex");
+}
+
+function signCallbackMd5(merchantCode: string, amount: string, merchantOrderId: string, apiKey: string) {
+  return crypto.createHash("md5").update(`${merchantCode}${amount}${merchantOrderId}${apiKey}`).digest("hex");
+}
+
+async function parseCallbackPayload(request: Request) {
+  const contentType = request.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    const json = (await request.json()) as Record<string, unknown>;
+
+    return Object.fromEntries(Object.entries(json).map(([key, value]) => [key, String(value ?? "")]));
+  }
+
+  const formData = await request.formData();
+
+  return Object.fromEntries(Array.from(formData.entries()).map(([key, value]) => [key, String(value)]));
 }
 
 export async function POST(request: Request) {
@@ -14,26 +32,28 @@ export async function POST(request: Request) {
     return new Response("Duitku API key is not configured", { status: 500 });
   }
 
-  const formData = await request.formData();
-  const merchantCode = String(formData.get("merchantCode") ?? "");
-  const amount = String(formData.get("amount") ?? "");
-  const merchantOrderId = String(formData.get("merchantOrderId") ?? "");
-  const resultCode = String(formData.get("resultCode") ?? "");
-  const paymentCode = String(formData.get("paymentCode") ?? "");
-  const reference = String(formData.get("reference") ?? "");
-  const signature = String(formData.get("signature") ?? "");
+  const callbackPayload = await parseCallbackPayload(request);
+  const merchantCode = callbackPayload.merchantCode || "";
+  const amount = callbackPayload.amount || callbackPayload.paymentAmount || "";
+  const merchantOrderId = callbackPayload.merchantOrderId || "";
+  const resultCode = callbackPayload.resultCode || "";
+  const paymentCode = callbackPayload.paymentCode || "";
+  const reference = callbackPayload.reference || "";
+  const signature = callbackPayload.signature || "";
 
   if (!merchantCode || !amount || !merchantOrderId || !signature) {
     return new Response("Invalid callback payload", { status: 400 });
   }
 
-  const expectedSignature = signCallback(merchantCode, amount, merchantOrderId, apiKey);
+  const validSignatures = [
+    signCallbackMd5(merchantCode, amount, merchantOrderId, apiKey),
+    signCallbackHmac(merchantCode, amount, merchantOrderId, apiKey),
+  ];
 
-  if (signature.toLowerCase() !== expectedSignature.toLowerCase()) {
+  if (!validSignatures.some((validSignature) => signature.toLowerCase() === validSignature.toLowerCase())) {
     return new Response("Invalid callback signature", { status: 400 });
   }
 
-  const callbackPayload = Object.fromEntries(formData.entries());
   const status = resultCode === "00" ? "paid" : resultCode === "01" ? "pending" : "cancelled";
   const updatePayload: Record<string, unknown> = {
     status,
@@ -48,7 +68,20 @@ export async function POST(request: Request) {
   }
 
   const supabase = getServiceSupabase();
-  await supabase.from("checkout_transactions").update(updatePayload).eq("merchant_order_id", merchantOrderId);
+  const { error } = await supabase
+    .from("checkout_transactions")
+    .update(updatePayload)
+    .eq("merchant_order_id", merchantOrderId);
+
+  if (error) {
+    console.error("Failed to update Duitku callback transaction", {
+      merchantOrderId,
+      resultCode,
+      message: error.message,
+    });
+
+    return new Response("Failed to update transaction", { status: 500 });
+  }
 
   console.info("Duitku V2 callback received", {
     merchantCode,

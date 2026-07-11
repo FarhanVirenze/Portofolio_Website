@@ -2,15 +2,13 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-let hasSeenSplashInRuntime = false;
-
 interface LoadingContextType {
   isLoaded: boolean;
   setIsLoaded: (loaded: boolean) => void;
 }
 
 const LoadingContext = createContext<LoadingContextType>({
-  isLoaded: false,
+  isLoaded: true,
   setIsLoaded: () => {},
 });
 
@@ -19,15 +17,7 @@ export function useLoading() {
 }
 
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
-  const [isLoaded, setIsLoadedState] = useState(hasSeenSplashInRuntime);
-
-  const setIsLoaded = (loaded: boolean) => {
-    if (loaded) {
-      hasSeenSplashInRuntime = true;
-    }
-
-    setIsLoadedState(loaded);
-  };
+  const [isLoaded, setIsLoaded] = useState(true);
 
   useEffect(() => {
     // Prevent scrolling while loading

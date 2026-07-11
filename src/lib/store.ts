@@ -21,7 +21,7 @@ export const products: Product[] = [
     shortName: "Landing Page",
     description:
       "Halaman promosi responsif untuk produk, event, atau jasa dengan copywriting ringkas, desain modern, dan optimasi tampilan mobile.",
-    price: 10000,
+    price: 750000,
     timeline: "3-5 hari kerja",
     includes: ["1 halaman utama", "Form kontak", "SEO dasar", "Deploy ke hosting"],
   },

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Clock, ExternalLink, Loader2, PackageCheck, ReceiptText } from "lucide-react";
+import { Clock, CreditCard, Loader2, PackageCheck, ReceiptText } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatRupiah } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -218,15 +218,13 @@ export default function OrdersPage() {
 
                     <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
                       {canPay && (
-                        <a
-                          href={order.payment_url || "#"}
-                          target="_blank"
-                          rel="noreferrer"
+                        <Link
+                          href={`/checkout/payment?order=${encodeURIComponent(order.merchant_order_id)}`}
                           className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
                         >
-                          <ExternalLink className="h-4 w-4" />
+                          <CreditCard className="h-4 w-4" />
                           Lanjut Bayar
-                        </a>
+                        </Link>
                       )}
                     </div>
                   </div>

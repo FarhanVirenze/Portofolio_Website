@@ -3,7 +3,6 @@ import { Footer } from "@/components/footer";
 import { ParticleBackground } from "@/components/ui/particle-background";
 import { GsapProvider } from "@/components/gsap-provider";
 import { LoadingProvider } from "@/components/loading-provider";
-import { SplashScreen } from "@/components/splash-screen";
 
 export default function PublicLayout({
   children,
@@ -13,7 +12,6 @@ export default function PublicLayout({
   return (
     <LoadingProvider>
       <GsapProvider>
-        <SplashScreen />
         <ParticleBackground />
         <Navbar />
         <main className="flex-1 w-full">

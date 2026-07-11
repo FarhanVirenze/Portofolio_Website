@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2, Clock, XCircle } from "lucide-react";
+import { getServiceSupabase } from "@/lib/supabase";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type CheckoutReturnPageProps = {
   searchParams: Promise<{
@@ -36,8 +38,40 @@ function getStatus(resultCode?: string) {
   };
 }
 
+async function syncReturnStatus(params: Awaited<CheckoutReturnPageProps["searchParams"]>) {
+  if (!params.merchantOrderId || !params.resultCode) return;
+
+  const authSupabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await authSupabase.auth.getUser();
+
+  if (!user) return;
+
+  const status = params.resultCode === "00" ? "paid" : params.resultCode === "02" ? "cancelled" : "pending";
+  const updatePayload: Record<string, unknown> = {
+    status,
+    result_code: params.resultCode,
+  };
+
+  if (params.reference) {
+    updatePayload.duitku_reference = params.reference;
+  }
+
+  if (params.resultCode === "00") {
+    updatePayload.paid_at = new Date().toISOString();
+  }
+
+  await getServiceSupabase()
+    .from("checkout_transactions")
+    .update(updatePayload)
+    .eq("merchant_order_id", params.merchantOrderId)
+    .eq("user_id", user.id);
+}
+
 export default async function CheckoutReturnPage({ searchParams }: CheckoutReturnPageProps) {
   const params = await searchParams;
+  await syncReturnStatus(params);
   const status = getStatus(params.resultCode);
   const StatusIcon = status.icon;
 

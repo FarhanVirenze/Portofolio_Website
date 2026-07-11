@@ -53,12 +53,17 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
         throw new Error(data?.message ?? "Checkout belum bisa diproses.");
       }
 
-      if (typeof data.paymentUrl === "string") {
-        window.location.href = data.paymentUrl;
+      if (typeof data.redirectTo === "string") {
+        window.location.href = data.redirectTo;
         return;
       }
 
-      throw new Error("Gateway pembayaran tidak mengembalikan URL pembayaran.");
+      if (typeof data.merchantOrderId === "string") {
+        window.location.href = `/checkout/payment?order=${encodeURIComponent(data.merchantOrderId)}`;
+        return;
+      }
+
+      throw new Error("Gateway pembayaran tidak mengembalikan halaman pembayaran.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Terjadi kesalahan saat checkout.");
     } finally {
