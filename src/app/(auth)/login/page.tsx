@@ -290,28 +290,19 @@ function LoginPageInner() {
       </div>
 
       {/* Right Panel - Photo */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-indigo-500/5">
-        <div className="absolute top-[15%] left-[10%] w-[28rem] h-[28rem] bg-primary/15 rounded-full blur-[100px] animate-pulse-glow" />
-        <div className="absolute bottom-[15%] right-[10%] w-[24rem] h-[24rem] bg-indigo-500/10 rounded-full blur-[80px] animate-float" style={{ animationDelay: "1s" }} />
-
+      <div className="hidden lg:block lg:w-1/2 relative overflow-hidden">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative z-10 flex flex-col items-center"
+          className="absolute inset-0"
         >
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-indigo-500/20 rounded-full blur-2xl animate-pulse-glow" />
-            <img
-              src="/img/farhan.png"
-              alt="Farhan"
-              className="relative w-72 h-72 object-cover rounded-full border-4 border-border/50 shadow-2xl shadow-primary/20"
-            />
-          </div>
-          <h2 className="mt-8 text-3xl font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">Farhan</span>
-          </h2>
-          <p className="mt-2 text-muted-foreground">Full Stack Developer</p>
+          <img
+            src="/img/farhan.png"
+            alt="Farhan"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/20 via-transparent to-transparent" />
         </motion.div>
       </div>
     </div>
