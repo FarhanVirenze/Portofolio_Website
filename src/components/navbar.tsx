@@ -3,17 +3,8 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Award, Briefcase, Headphones, History, Home, LogOut, Settings, ShoppingCart, User } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -229,6 +220,33 @@ function UserMenu({
   onLogout: () => Promise<void>;
   compact?: boolean;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
   if (!user) {
     return (
       <div className="flex items-center gap-2">
@@ -255,49 +273,61 @@ function UserMenu({
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full outline-none transition-transform hover:scale-105 focus-visible:ring-3 focus-visible:ring-ring/50"
-        aria-label="User menu"
+    <div ref={menuRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen((current) => !current)}
+        className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-border bg-muted text-sm font-semibold text-foreground outline-none transition-transform hover:scale-105 focus-visible:ring-3 focus-visible:ring-ring/50"
+        aria-label="Buka menu profile"
+        aria-expanded={isOpen}
       >
-        <Avatar size="lg">
-          <AvatarImage src={user.user_metadata?.avatar_url || ""} alt={displayName} />
-          <AvatarFallback>{initials || "U"}</AvatarFallback>
-        </Avatar>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
-          <span className="block truncate text-foreground">{displayName}</span>
-          <span className="block truncate text-xs font-normal">{user.email}</span>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          render={
-            <Link href="/orders" className="flex w-full items-center gap-2" />
-          }
-        >
+        {user.user_metadata?.avatar_url ? (
+          <span
+            aria-label={displayName}
+            className="h-full w-full bg-cover bg-center"
+            style={{ backgroundImage: `url(${user.user_metadata.avatar_url})` }}
+          />
+        ) : (
+          <span>{initials || "U"}</span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-12 z-[80] w-64 rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-xl shadow-black/10">
+          <div className="px-3 py-2">
+            <p className="truncate text-sm font-semibold text-foreground">{displayName}</p>
+            <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+          </div>
+          <div className="my-1 h-px bg-border" />
+          <Link
+            href="/orders"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
             <History className="h-4 w-4" />
             History Pesanan
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          render={
-            <Link href="/settings" className="flex w-full items-center gap-2" />
-          }
-        >
+          </Link>
+          <Link
+            href="/settings"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
             <Settings className="h-4 w-4" />
             Settings
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          variant="destructive"
-          onClick={(event) => {
-            event.preventDefault();
-            onLogout();
-          }}
-        >
-          <LogOut className="h-4 w-4" />
-          Logout
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </Link>
+          <button
+            type="button"
+            onClick={() => {
+              setIsOpen(false);
+              onLogout();
+            }}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-destructive transition-colors hover:bg-destructive/10"
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

@@ -4,8 +4,6 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useLoading } from "./loading-provider";
 
-const SPLASH_SESSION_KEY = "farhan_splash_seen";
-
 export function SplashScreen() {
   const textRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -32,7 +30,6 @@ export function SplashScreen() {
 
     const tl = gsap.timeline({
       onComplete: () => {
-        window.sessionStorage.setItem(SPLASH_SESSION_KEY, "true");
         setIsLoaded(true); // Signal the app to start
       }
     });
