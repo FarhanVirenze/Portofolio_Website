@@ -9,7 +9,6 @@ export function proxy(request: NextRequest) {
     const adminSession = request.cookies.get("admin_session");
 
     if (!adminSession || adminSession.value !== "true") {
-      // Redirect to login if not authenticated
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }

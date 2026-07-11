@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, User, FolderOpen, Award, LayoutDashboard, LogOut } from "lucide-react";
+import { Home, User, FolderOpen, Award, LayoutDashboard, LogOut, Package, BarChart3 } from "lucide-react";
 import { logoutAction } from "@/app/actions/auth";
 
 const menuItems = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  { label: "Transactions", href: "/admin/transactions", icon: BarChart3 },
   { label: "Home", href: "/admin/home", icon: Home },
   { label: "About", href: "/admin/about", icon: User },
   { label: "Portfolio", href: "/admin/portofolio", icon: FolderOpen },
   { label: "Certification", href: "/admin/certification", icon: Award },
+  { label: "Products", href: "/admin/products", icon: Package },
 ];
 
 export function AdminSidebar() {

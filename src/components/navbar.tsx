@@ -292,7 +292,7 @@ function UserMenu({
         <Link
           href="/register"
           className={cn(
-            "hidden items-center justify-center rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80 sm:inline-flex",
+            "inline-flex items-center justify-center rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80",
             compact ? "h-9" : "h-9"
           )}
         >

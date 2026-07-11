@@ -15,6 +15,9 @@ function LoginPageInner() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [isResetMode, setIsResetMode] = useState(false);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [isResetLoading, setIsResetLoading] = useState(false);
 
   const supabase = createSupabaseBrowserClient();
 
@@ -51,6 +54,68 @@ function LoginPageInner() {
 
     window.location.href = redirectTo;
   };
+
+  const resetPassword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsResetLoading(true);
+    setResetMessage(null);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/settings`,
+    });
+
+    if (error) {
+      setResetMessage(error.message);
+    } else {
+      setResetMessage("Link reset password sudah dikirim ke email kamu. Cek inbox atau spam.");
+    }
+    setIsResetLoading(false);
+  };
+
+  if (isResetMode) {
+    return (
+      <section className="relative z-10 flex min-h-screen items-center justify-center bg-background px-6 py-28">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-sm md:p-8">
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Reset Password</p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">Lupa Password</h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Masukkan email kamu dan kami akan mengirimkan link untuk reset password.
+          </p>
+
+          <form className="mt-7 space-y-4" onSubmit={resetPassword}>
+            <label className="block space-y-2 text-sm font-medium text-foreground">
+              Email
+              <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+            </label>
+
+            {resetMessage && (
+              <p className="rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+                {resetMessage}
+              </p>
+            )}
+
+            <Button type="submit" size="lg" className="h-11 w-full rounded-xl" disabled={isResetLoading}>
+              {isResetLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              Kirim Link Reset
+            </Button>
+          </form>
+
+          <p className="mt-5 text-center text-sm text-muted-foreground">
+            <button
+              type="button"
+              onClick={() => {
+                setIsResetMode(false);
+                setResetMessage(null);
+              }}
+              className="font-medium text-primary hover:text-primary/80"
+            >
+              Kembali ke Login
+            </button>
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative z-10 flex min-h-screen items-center justify-center bg-background px-6 py-28">
@@ -102,6 +167,15 @@ function LoginPageInner() {
           <Link href="/register" className="font-medium text-primary hover:text-primary/80">
             Register
           </Link>
+        </p>
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          <button
+            type="button"
+            onClick={() => setIsResetMode(true)}
+            className="font-medium text-primary hover:text-primary/80"
+          >
+            Lupa Password?
+          </button>
         </p>
       </div>
     </section>

@@ -1,9 +1,17 @@
 import { NextResponse } from "next/server";
 import { metricsRegistry } from "@/lib/metrics";
+import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const cookieStore = await cookies();
+  const adminSession = cookieStore.get("admin_session");
+
+  if (!adminSession || adminSession.value !== "true") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const metrics = await metricsRegistry.metrics();
 

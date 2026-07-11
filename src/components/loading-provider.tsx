@@ -17,10 +17,17 @@ export function useLoading() {
 }
 
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
-  const [isLoaded, setIsLoaded] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Prevent scrolling while loading
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     if (!isLoaded) {
       document.body.style.overflow = "hidden";
     } else {

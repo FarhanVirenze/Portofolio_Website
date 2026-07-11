@@ -50,7 +50,7 @@ export function AboutSection({ skills, bioParagraphs, profileImageUrl }: AboutSe
                       {/* Name at bottom */}
                       <div className="absolute bottom-0 left-0 right-0 p-8">
                         <h2 className="text-3xl font-bold text-foreground">Muhamad Farhan</h2>
-                        <p className="text-primary font-medium text-lg mt-1">Software Engineer</p>
+                        <p className="text-primary font-medium text-lg mt-1">Informatics Student</p>
                       </div>
                     </div>
                   </div>

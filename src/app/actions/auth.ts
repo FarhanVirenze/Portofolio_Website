@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getServiceSupabase } from "@/lib/supabase";
 import { authAttemptsTotal, serverActionDuration, serverActionTotal } from "@/lib/metrics";
+import bcrypt from "bcryptjs";
 
 export async function loginAction(prevState: any, formData: FormData) {
   const endTimer = serverActionDuration.startTimer({ action: "loginAction" });
@@ -18,19 +19,16 @@ export async function loginAction(prevState: any, formData: FormData) {
 
   if (isSupabaseConfigured) {
     const supabase = getServiceSupabase();
-    // In a real app we'd use Supabase Auth or hash passwords, but for this simple setup:
     const { data } = await supabase
       .from("admins")
       .select("*")
       .eq("email", email)
-      .eq("password", password)
       .single();
     
-    if (data) {
+    if (data && await bcrypt.compare(password, data.password)) {
       isValidUser = true;
     }
   } else {
-    // Fallback to .env.local
     const validEmail = process.env.ADMIN_EMAIL || "admin@admin.com";
     const validPassword = process.env.ADMIN_PASSWORD || "adminpassword";
     if (email === validEmail && password === validPassword) {

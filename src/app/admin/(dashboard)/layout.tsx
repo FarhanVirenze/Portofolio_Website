@@ -1,4 +1,5 @@
 import { AdminSidebar } from "@/components/admin-sidebar";
+import { ToastContainer } from "@/components/toast";
 
 export default function AdminDashboardLayout({
   children,
@@ -13,6 +14,7 @@ export default function AdminDashboardLayout({
           {children}
         </main>
       </div>
+      <ToastContainer />
     </div>
   );
 }

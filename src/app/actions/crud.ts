@@ -328,3 +328,51 @@ export const deleteCertification = trackServerAction("deleteCertification", asyn
   revalidatePath("/certification");
   revalidatePath("/admin/certification");
 });
+
+// PRODUCTS
+export const addProduct = trackServerAction("addProduct", async (formData: FormData) => {
+  await verifyAuth();
+  const supabase = getServiceSupabase();
+  const name = formData.get("name") as string;
+  const short_name = formData.get("short_name") as string;
+  const description = formData.get("description") as string;
+  const price = Number(formData.get("price"));
+  const timeline = formData.get("timeline") as string;
+  const includes = (formData.get("includes") as string).split(",").map(i => i.trim()).filter(i => i);
+
+  const { error } = await supabase.from("products").insert([{ name, short_name, description, price, timeline, includes }]);
+  if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "product", operation: "create" });
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+});
+
+export const updateProduct = trackServerAction("updateProduct", async (id: string, formData: FormData) => {
+  await verifyAuth();
+  const supabase = getServiceSupabase();
+  const name = formData.get("name") as string;
+  const short_name = formData.get("short_name") as string;
+  const description = formData.get("description") as string;
+  const price = Number(formData.get("price"));
+  const timeline = formData.get("timeline") as string;
+  const includes = (formData.get("includes") as string).split(",").map(i => i.trim()).filter(i => i);
+
+  const { error } = await supabase.from("products").update({ name, short_name, description, price, timeline, includes }).eq("id", id);
+  if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "product", operation: "update" });
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+});
+
+export const deleteProduct = trackServerAction("deleteProduct", async (id: string) => {
+  await verifyAuth();
+  const supabase = getServiceSupabase();
+  const { error } = await supabase.from("products").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  
+  contentUpdatesTotal.inc({ content_type: "product", operation: "delete" });
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+});
