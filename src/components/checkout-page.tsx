@@ -26,6 +26,26 @@ type CheckoutPageProps = {
   initialProductId?: string;
 };
 
+function waitForCheckoutSdk(maxWaitMs = 8000): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window.checkout !== "undefined") {
+      resolve(true);
+      return;
+    }
+
+    const start = Date.now();
+    const interval = setInterval(() => {
+      if (typeof window.checkout !== "undefined") {
+        clearInterval(interval);
+        resolve(true);
+      } else if (Date.now() - start > maxWaitMs) {
+        clearInterval(interval);
+        resolve(false);
+      }
+    }, 200);
+  });
+}
+
 export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
   const [status, setStatus] = useState<"checking" | "processing" | "error">("checking");
   const [message, setMessage] = useState<string | null>(null);
@@ -43,6 +63,11 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
         }
 
         setStatus("processing");
+
+        const sdkReady = await waitForCheckoutSdk();
+        if (!sdkReady) {
+          throw new Error("Duitku Pop tidak tersedia. Pastikan JavaScript tidak diblokir lalu coba lagi.");
+        }
 
         const response = await fetch("/api/checkout/duitku", {
           method: "POST",
@@ -62,28 +87,24 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
         }
 
         if (typeof data.reference === "string" && data.reference) {
-          if (typeof window.checkout !== "undefined") {
-            window.checkout.process(data.reference, {
-              defaultLanguage: "id",
-              successEvent: (result) => {
-                window.location.href = `/checkout/return?merchantOrderId=${encodeURIComponent(result.merchantOrderId)}&resultCode=${result.resultCode}&reference=${result.reference}`;
-              },
-              pendingEvent: (result) => {
-                window.location.href = `/checkout/return?merchantOrderId=${encodeURIComponent(result.merchantOrderId)}&resultCode=${result.resultCode}&reference=${result.reference}`;
-              },
-              errorEvent: () => {
-                setMessage("Terjadi kesalahan pada pembayaran. Silakan coba lagi.");
-                setStatus("error");
-              },
-              closeEvent: () => {
-                setMessage("Popup pembayaran ditutup. Silakan coba lagi dari halaman produk.");
-                setStatus("error");
-              },
-            });
-            return;
-          }
-
-          throw new Error("Duitku Pop tidak tersedia. Silakan coba lagi.");
+          window.checkout!.process(data.reference, {
+            defaultLanguage: "id",
+            successEvent: (result) => {
+              window.location.href = `/checkout/return?merchantOrderId=${encodeURIComponent(result.merchantOrderId)}&resultCode=${result.resultCode}&reference=${result.reference}`;
+            },
+            pendingEvent: (result) => {
+              window.location.href = `/checkout/return?merchantOrderId=${encodeURIComponent(result.merchantOrderId)}&resultCode=${result.resultCode}&reference=${result.reference}`;
+            },
+            errorEvent: () => {
+              setMessage("Terjadi kesalahan pada pembayaran. Silakan coba lagi.");
+              setStatus("error");
+            },
+            closeEvent: () => {
+              setMessage("Popup pembayaran ditutup. Silakan coba lagi dari halaman produk.");
+              setStatus("error");
+            },
+          });
+          return;
         }
 
         throw new Error("Gateway pembayaran tidak mengembalikan referensi transaksi.");
