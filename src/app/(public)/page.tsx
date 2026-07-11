@@ -8,6 +8,7 @@ import { ThreeJsHero } from "@/components/three-js-hero";
 import { AboutSection } from "@/components/sections/about-section";
 import { PortfolioSection } from "@/components/sections/portfolio-section";
 import { CertificationSection } from "@/components/sections/certification-section";
+import { StoreSection } from "@/components/sections/store-section";
 import { Skill, Project, Certification } from "@/lib/types";
 
 export default async function Home() {
@@ -153,7 +154,10 @@ export default async function Home() {
       {/* 3. Portfolio Section */}
       <PortfolioSection projects={projects} />
 
-      {/* 4. Certification Section */}
+      {/* 4. Product & Checkout Section */}
+      <StoreSection />
+
+      {/* 5. Certification Section */}
       <CertificationSection certifications={certifications} />
       
     </div>

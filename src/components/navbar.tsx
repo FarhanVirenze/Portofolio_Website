@@ -5,18 +5,32 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Home, User, Briefcase, Award } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { Award, Briefcase, Headphones, Home, LogOut, Settings, ShoppingCart, User } from "lucide-react";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const navLinks = [
   { name: "Home", path: "#hero", icon: Home },
   { name: "About", path: "#about", icon: User },
   { name: "Portofolio", path: "#portfolio", icon: Briefcase },
+  { name: "Produk", path: "#products", icon: ShoppingCart },
+  { name: "Support", path: "#support", icon: Headphones },
   { name: "Certification", path: "#certification", icon: Award },
 ];
 
 export function Navbar() {
   const [activeSection, setActiveSection] = useState("#hero");
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,20 +41,25 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
     // Intersection Observer to detect active section
     const observer = new IntersectionObserver(
       (entries) => {
-        // Find the entry that is intersecting the most
-        let maxRatio = 0;
-        let mostVisibleSection = activeSection;
-
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-            maxRatio = entry.intersectionRatio;
-            mostVisibleSection = `#${entry.target.id}`;
-          }
-        });
-
         // Special case for portfolio because it pins (starts taking up 100% early)
         // Adjusting thresholds based on what's visible
         entries.forEach((entry) => {
@@ -57,7 +76,7 @@ export function Navbar() {
       }
     );
 
-    const sections = document.querySelectorAll("section[id], div[id='portfolio'], div[id='certification'], div[id='about']");
+    const sections = document.querySelectorAll("section[id], aside[id='support'], div[id='portfolio'], div[id='certification'], div[id='about']");
     sections.forEach((section) => observer.observe(section));
 
     return () => {
@@ -74,6 +93,21 @@ export function Navbar() {
       setActiveSection(path);
     }
   };
+
+  const handleLogout = async () => {
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    window.location.href = "/";
+  };
+
+  const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || "User";
+  const initials = displayName
+    .split(" ")
+    .map((part: string) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <>
@@ -125,13 +159,17 @@ export function Navbar() {
               })}
             </ul>
 
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <UserMenu user={user} displayName={displayName} initials={initials} onLogout={handleLogout} />
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Mobile Top Right Theme Toggle */}
-      <div className="md:hidden fixed top-4 right-4 z-[60]">
+      <div className="md:hidden fixed top-4 right-4 z-[60] flex items-center gap-2">
+        <UserMenu user={user} displayName={displayName} initials={initials} onLogout={handleLogout} compact />
         <ThemeToggle />
       </div>
 
@@ -175,5 +213,75 @@ export function Navbar() {
         </div>
       </nav>
     </>
+  );
+}
+
+function UserMenu({
+  user,
+  displayName,
+  initials,
+  onLogout,
+  compact = false,
+}: {
+  user: SupabaseUser | null;
+  displayName: string;
+  initials: string;
+  onLogout: () => Promise<void>;
+  compact?: boolean;
+}) {
+  if (!user) {
+    return (
+      <div className="flex items-center gap-2">
+        <Link
+          href="/login"
+          className={cn(
+            "inline-flex items-center justify-center rounded-lg border border-border bg-background/70 px-3 text-sm font-medium transition-colors hover:bg-muted",
+            compact ? "h-9" : "h-9"
+          )}
+        >
+          Login
+        </Link>
+        <Link
+          href="/register"
+          className={cn(
+            "hidden items-center justify-center rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80 sm:inline-flex",
+            compact ? "h-9" : "h-9"
+          )}
+        >
+          Register
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full outline-none transition-transform hover:scale-105 focus-visible:ring-3 focus-visible:ring-ring/50"
+        aria-label="User menu"
+      >
+        <Avatar size="lg">
+          <AvatarImage src={user.user_metadata?.avatar_url || ""} alt={displayName} />
+          <AvatarFallback>{initials || "U"}</AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>
+          <span className="block truncate text-foreground">{displayName}</span>
+          <span className="block truncate text-xs font-normal">{user.email}</span>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Link href="/settings" className="flex w-full items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem variant="destructive" onClick={onLogout}>
+          <LogOut className="h-4 w-4" />
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

@@ -23,19 +23,19 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://xffarhans.my.id'),
   title: {
-    default: "Muhamad Farhan | Portofolio",
+    default: "Muhamad Farhan | Produk Digital & Portofolio",
     template: "%s | Muhamad Farhan"
   },
-  description: "Personal website of Muhamad Farhan, a Full-stack Engineer.",
-  keywords: ["Muhamad Farhan", "Portfolio", "Full-stack Engineer", "Web Developer", "Next.js", "React"],
+  description: "Website Muhamad Farhan untuk portofolio, produk jasa pembuatan website, checkout, dan pembayaran online via Duitku Sandbox.",
+  keywords: ["Muhamad Farhan", "Portfolio", "Produk Digital", "Jasa Website", "Checkout Duitku", "Web Developer", "Next.js", "React"],
   authors: [{ name: "Muhamad Farhan" }],
   creator: "Muhamad Farhan",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "/",
-    title: "Muhamad Farhan | Portofolio",
-    description: "Personal website of Muhamad Farhan, a Full-stack Engineer.",
+    title: "Muhamad Farhan | Produk Digital & Portofolio",
+    description: "Portofolio dan produk jasa pembuatan website dengan checkout pembayaran online via Duitku Sandbox.",
     siteName: "Muhamad Farhan Portfolio",
     images: [
       {
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Muhamad Farhan | Portofolio",
-    description: "Personal website of Muhamad Farhan, a Full-stack Engineer.",
+    title: "Muhamad Farhan | Produk Digital & Portofolio",
+    description: "Portofolio dan produk jasa pembuatan website dengan checkout pembayaran online via Duitku Sandbox.",
     creator: "@farhan", // Ganti dengan handle twitter jika ada
   },
   robots: {
@@ -99,4 +99,3 @@ export default async function RootLayout({
     </html>
   );
 }
-
