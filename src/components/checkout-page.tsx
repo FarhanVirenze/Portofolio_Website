@@ -27,23 +27,44 @@ type CheckoutPageProps = {
   initialProductId?: string;
 };
 
-function waitForCheckoutSdk(maxWaitMs = 8000): Promise<boolean> {
+function loadDuitkuSdk(): Promise<boolean> {
   return new Promise((resolve) => {
     if (typeof window.checkout !== "undefined") {
       resolve(true);
       return;
     }
 
-    const start = Date.now();
-    const interval = setInterval(() => {
-      if (typeof window.checkout !== "undefined") {
-        clearInterval(interval);
-        resolve(true);
-      } else if (Date.now() - start > maxWaitMs) {
-        clearInterval(interval);
-        resolve(false);
-      }
-    }, 200);
+    const existingScript = document.querySelector(`script[src*="duitku"]`);
+    if (existingScript) {
+      const start = Date.now();
+      const interval = setInterval(() => {
+        if (typeof window.checkout !== "undefined") {
+          clearInterval(interval);
+          resolve(true);
+        } else if (Date.now() - start > 8000) {
+          clearInterval(interval);
+          resolve(false);
+        }
+      }, 200);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = process.env.NEXT_PUBLIC_DUITKU_POP_JS_URL || "https://app-prod.duitku.com/lib/js/duitku.js";
+    script.onload = () => {
+      const start = Date.now();
+      const interval = setInterval(() => {
+        if (typeof window.checkout !== "undefined") {
+          clearInterval(interval);
+          resolve(true);
+        } else if (Date.now() - start > 5000) {
+          clearInterval(interval);
+          resolve(false);
+        }
+      }, 200);
+    };
+    script.onerror = () => resolve(false);
+    document.head.appendChild(script);
   });
 }
 
@@ -80,7 +101,7 @@ export function CheckoutPage({ initialProductId }: CheckoutPageProps) {
     setMessage(null);
 
     try {
-      const sdkReady = await waitForCheckoutSdk();
+      const sdkReady = await loadDuitkuSdk();
       if (!sdkReady) {
         throw new Error("Duitku Pop tidak tersedia. Pastikan JavaScript tidak diblokir lalu coba lagi.");
       }
