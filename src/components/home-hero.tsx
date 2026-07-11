@@ -20,8 +20,31 @@ export function HomeHero({ children }: { children: React.ReactNode }) {
       gsap.set(".hero-name-left", { x: -200, opacity: 0 });
       gsap.set(".hero-name-right", { x: 200, opacity: 0 });
       gsap.set(".hero-image", { scale: 0.5, opacity: 0, rotate: -15 });
+      gsap.set(".hero-greeting", { y: 20, opacity: 0 });
+      gsap.set(".hero-roles-wrapper", { y: 20, opacity: 0 });
+      gsap.set(".hero-desc-word", { y: 20, opacity: 0 });
+      gsap.set(".hero-buttons", { y: 20, opacity: 0 });
     }, containerRef);
-    return () => ctx.revert();
+
+    // Safety fallback: force visible if GSAP doesn't run within 2s
+    const fallback = setTimeout(() => {
+      if (!containerRef.current) return;
+      const els = containerRef.current.querySelectorAll(
+        ".hero-greeting, .hero-name-left, .hero-name-right, .hero-roles-wrapper, .hero-desc-word, .hero-buttons, .hero-image"
+      );
+      els.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        if (htmlEl.style.opacity === "0" || htmlEl.style.opacity === "") {
+          htmlEl.style.opacity = "1";
+          htmlEl.style.transform = "none";
+        }
+      });
+    }, 2000);
+
+    return () => {
+      clearTimeout(fallback);
+      ctx.revert();
+    };
   }, []);
 
   // 2. Main Animations (Entrance, Scroll, Floating, Mouse)

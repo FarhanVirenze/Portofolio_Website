@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Clock, Loader2, PackageCheck, ReceiptText } from "lucide-react";
+import { Clock, CreditCard, Loader2, PackageCheck, ReceiptText } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatRupiah } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -79,6 +79,7 @@ export default function OrdersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [, setNowTick] = useState(0);
+  const [retryingOrderId, setRetryingOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -127,6 +128,38 @@ export default function OrdersPage() {
     },
     { pending: 0, paid: 0, cancelled: 0, expired: 0 }
   );
+
+  const handleContinuePayment = async (order: Order) => {
+    if (!order.duitku_reference) return;
+    setRetryingOrderId(order.id);
+
+    try {
+      const sdkReady = await loadDuitkuSdk();
+      if (!sdkReady) {
+        throw new Error("Duitku Pop tidak tersedia. Pastikan JavaScript tidak diblokir.");
+      }
+
+      window.checkout!.process(order.duitku_reference, {
+        defaultLanguage: "id",
+        successEvent: (result) => {
+          window.location.href = `/checkout/return?merchantOrderId=${encodeURIComponent(result.merchantOrderId)}&resultCode=${result.resultCode}&reference=${result.reference}`;
+        },
+        pendingEvent: (result) => {
+          window.location.href = `/checkout/return?merchantOrderId=${encodeURIComponent(result.merchantOrderId)}&resultCode=${result.resultCode}&reference=${result.reference}`;
+        },
+        errorEvent: () => {
+          alert("Terjadi kesalahan pada pembayaran. Silakan coba lagi.");
+          setRetryingOrderId(null);
+        },
+        closeEvent: () => {
+          setRetryingOrderId(null);
+        },
+      });
+    } catch {
+      alert("Gagal memuat pembayaran. Silakan coba lagi.");
+      setRetryingOrderId(null);
+    }
+  };
 
   return (
     <section className="relative z-10 min-h-screen bg-background px-6 py-28 text-foreground md:px-10 lg:px-16">
@@ -218,6 +251,24 @@ export default function OrdersPage() {
                         <InfoItem label="Reference" value={order.duitku_reference || "-"} />
                       </dl>
                     </div>
+
+                    {status === "pending" && order.duitku_reference && (
+                      <div className="flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleContinuePayment(order)}
+                          disabled={retryingOrderId === order.id}
+                          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80 disabled:opacity-50"
+                        >
+                          {retryingOrderId === order.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <CreditCard className="h-4 w-4" />
+                          )}
+                          {retryingOrderId === order.id ? "Memproses..." : "Lanjut Bayar"}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </article>
               );
@@ -245,4 +296,62 @@ function InfoItem({ label, value }: { label: string; value: string }) {
       <dd className="mt-1 break-words font-medium text-foreground">{value}</dd>
     </div>
   );
+}
+
+declare global {
+  interface Window {
+    checkout?: {
+      process: (
+        reference: string,
+        options: {
+          defaultLanguage?: string;
+          successEvent?: (result: { resultCode: string; merchantOrderId: string; reference: string }) => void;
+          pendingEvent?: (result: { resultCode: string; merchantOrderId: string; reference: string }) => void;
+          errorEvent?: (result: { resultCode: string; merchantOrderId: string; reference: string }) => void;
+          closeEvent?: (result: { resultCode: string; merchantOrderId: string; reference: string }) => void;
+        }
+      ) => void;
+    };
+  }
+}
+
+function loadDuitkuSdk(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window.checkout !== "undefined") {
+      resolve(true);
+      return;
+    }
+
+    const existingScript = document.querySelector(`script[src*="duitku"]`);
+    if (existingScript) {
+      const start = Date.now();
+      const interval = setInterval(() => {
+        if (typeof window.checkout !== "undefined") {
+          clearInterval(interval);
+          resolve(true);
+        } else if (Date.now() - start > 8000) {
+          clearInterval(interval);
+          resolve(false);
+        }
+      }, 200);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = process.env.NEXT_PUBLIC_DUITKU_POP_JS_URL || "https://app-prod.duitku.com/lib/js/duitku.js";
+    script.onload = () => {
+      const start = Date.now();
+      const interval = setInterval(() => {
+        if (typeof window.checkout !== "undefined") {
+          clearInterval(interval);
+          resolve(true);
+        } else if (Date.now() - start > 5000) {
+          clearInterval(interval);
+          resolve(false);
+        }
+      }, 200);
+    };
+    script.onerror = () => resolve(false);
+    document.head.appendChild(script);
+  });
 }

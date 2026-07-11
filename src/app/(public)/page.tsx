@@ -92,14 +92,14 @@ export default async function Home() {
             <div className="flex flex-col-reverse gap-10 items-center md:flex-row md:gap-16 md:justify-between w-full">
               {/* Text Content */}
               <div className="space-y-5 text-center md:text-left flex-1">
-                <p className="hero-greeting text-xs font-mono tracking-widest text-muted-foreground uppercase mb-2 opacity-0 -translate-y-4">{greeting}</p>
+                <p className="hero-greeting text-xs font-mono tracking-widest text-muted-foreground uppercase mb-2">{greeting}</p>
                 
                 <h1 className="text-6xl md:text-7xl lg:text-8xl font-medium tracking-tight text-foreground leading-[1.05] flex flex-col md:inline-block overflow-hidden pb-2">
                   <span className="hero-name-left inline-block md:pr-4">Muhamad</span>
                   <span className="hero-name-right inline-block text-primary">Farhan</span>
                 </h1>
                 
-                <div className="hero-roles-wrapper py-1 h-10 mt-2 opacity-0">
+                <div className="hero-roles-wrapper py-1 h-10 mt-2">
                   <h2 className="text-lg md:text-xl font-medium text-foreground/70 tracking-tight">
                     <Typewriter words={roles} />
                   </h2>
@@ -107,11 +107,11 @@ export default async function Home() {
                 
                 <p className="hero-desc text-muted-foreground text-base max-w-lg mx-auto md:mx-0 leading-relaxed overflow-hidden">
                   {description.split(" ").map((word, i) => (
-                    <span key={i} className="hero-desc-word inline-block mr-1 opacity-0 translate-y-4">{word}</span>
+                    <span key={i} className="hero-desc-word inline-block mr-1">{word}</span>
                   ))}
                 </p>
                 
-                <div className="hero-buttons pt-4 flex flex-wrap justify-center md:justify-start gap-3 opacity-0 translate-y-4">
+                <div className="hero-buttons pt-4 flex flex-wrap justify-center md:justify-start gap-3">
                   <MagneticButton>
                     <a
                       href={cvUrl}
@@ -127,7 +127,7 @@ export default async function Home() {
 
               {/* Profile Image */}
               <div className="hero-image-wrapper flex justify-center md:justify-end flex-shrink-0">
-                <div className="hero-image relative w-56 h-56 md:w-80 md:h-80 opacity-0">
+                <div className="hero-image relative w-56 h-56 md:w-80 md:h-80">
                   <div className="absolute -inset-3 bg-gradient-to-tr from-primary/50 via-violet-500/40 to-indigo-500/50 dark:-inset-2 dark:from-primary/30 dark:via-violet-400/20 dark:to-indigo-400/30 rounded-full blur-2xl dark:blur-xl animate-pulse-glow" />
                   <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-primary via-violet-500 to-indigo-500 dark:via-violet-400 dark:to-indigo-400 opacity-80 dark:opacity-50 shadow-lg shadow-primary/20 dark:shadow-none" />
                   <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-background shadow-2xl">
