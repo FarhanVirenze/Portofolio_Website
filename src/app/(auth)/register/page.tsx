@@ -28,7 +28,7 @@ function RegisterPageInner() {
     setIsLoading(true);
     setMessage(null);
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -44,13 +44,15 @@ function RegisterPageInner() {
       return;
     }
 
-    const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (loginError) {
-      setMessage("Register berhasil. Silakan cek email untuk konfirmasi lalu login.");
+    // Jika user sudah ada, Supabase mengembalikan identities yang kosong
+    if (data?.user?.identities?.length === 0) {
+      setMessage("Email ini sudah terdaftar. Silakan gunakan email lain atau login.");
       setIsLoading(false);
       return;
     }
+
+    // Coba login langsung tanpa mempedulikan error (misal karena auto-login sudah terjadi)
+    await supabase.auth.signInWithPassword({ email, password });
 
     const profileResponse = await fetch("/api/user/profile", {
       method: "PUT",
