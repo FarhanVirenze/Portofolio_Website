@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { metricsRegistry } from "@/lib/metrics";
 import { cookies } from "next/headers";
+import { verifySessionToken } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +9,7 @@ export async function GET() {
   const cookieStore = await cookies();
   const adminSession = cookieStore.get("admin_session");
 
-  if (!adminSession || adminSession.value !== "true") {
+  if (!adminSession || !verifySessionToken(adminSession.value).valid) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -25,7 +26,7 @@ export async function GET() {
   } catch (error) {
     console.error("Error collecting metrics:", error);
     return NextResponse.json(
-      { error: "Failed to collect metrics", details: error instanceof Error ? error.message : String(error) },
+      { error: "Failed to collect metrics" },
       { status: 500 }
     );
   }

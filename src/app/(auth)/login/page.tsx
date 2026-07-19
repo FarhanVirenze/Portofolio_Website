@@ -32,9 +32,20 @@ function GoogleIcon() {
   );
 }
 
+function isValidRedirectPath(path: string): boolean {
+  if (!path) return false;
+  if (!path.startsWith("/")) return false;
+  if (path.startsWith("//")) return false;
+  if (path.includes("://")) return false;
+  if (path.includes("javascript:")) return false;
+  if (path.includes("data:")) return false;
+  return true;
+}
+
 function LoginPageInner() {
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/";
+  const rawRedirect = searchParams.get("redirect") || "/";
+  const redirectTo = isValidRedirectPath(rawRedirect) ? rawRedirect : "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);

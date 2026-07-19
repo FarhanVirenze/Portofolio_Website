@@ -28,6 +28,16 @@ export default function SettingsPage() {
   );
 }
 
+function isValidRedirectPath(path: string): boolean {
+  if (!path) return false;
+  if (!path.startsWith("/")) return false;
+  if (path.startsWith("//")) return false;
+  if (path.includes("://")) return false;
+  if (path.includes("javascript:")) return false;
+  if (path.includes("data:")) return false;
+  return true;
+}
+
 function SettingsPageInner() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect");
@@ -108,7 +118,7 @@ function SettingsPageInner() {
     setMessage("Profil berhasil disimpan.");
     setIsSaving(false);
 
-    if (redirectTo) {
+    if (redirectTo && isValidRedirectPath(redirectTo)) {
       window.location.href = redirectTo;
     }
   };

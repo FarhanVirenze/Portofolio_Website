@@ -10,9 +10,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 
+function isValidRedirectPath(path: string): boolean {
+  if (!path) return false;
+  if (!path.startsWith("/")) return false;
+  if (path.startsWith("//")) return false;
+  if (path.includes("://")) return false;
+  if (path.includes("javascript:")) return false;
+  if (path.includes("data:")) return false;
+  return true;
+}
+
 function RegisterPageInner() {
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/";
+  const rawRedirect = searchParams.get("redirect") || "/";
+  const redirectTo = isValidRedirectPath(rawRedirect) ? rawRedirect : "/";
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");

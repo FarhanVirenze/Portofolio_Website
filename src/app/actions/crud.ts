@@ -4,28 +4,43 @@ import { getServiceSupabase } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { trackServerAction, contentUpdatesTotal, fileUploadsTotal, fileUploadSize } from "@/lib/metrics";
+import { verifySessionToken } from "@/lib/session";
+import {
+  validateString,
+  validateRequired,
+  validateUrl,
+  validateNumber,
+  validateArray,
+  validateImageFile,
+  sanitizeError,
+} from "@/lib/validation";
 
 async function verifyAuth() {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("admin_session");
-  if (!sessionCookie || sessionCookie.value !== "true") {
-    throw new Error("Unauthorized Access: You must be logged in as an admin to perform this action.");
+  if (!sessionCookie || !verifySessionToken(sessionCookie.value).valid) {
+    throw new Error("Unauthorized Access");
   }
 }
 
 async function uploadFileToStorage(file: File): Promise<string> {
+  const validation = validateImageFile(file);
+  if (!validation.valid) {
+    throw new Error(validation.error);
+  }
+
   const supabase = getServiceSupabase();
-  const ext = file.name.split(".").pop();
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
   const filePath = `uploads/${fileName}`;
 
   const { error } = await supabase.storage
     .from("images")
-    .upload(filePath, file, { cacheControl: "3600", upsert: false });
+    .upload(filePath, file, { cacheControl: "3600", upsert: false, contentType: file.type });
 
   if (error) {
     fileUploadsTotal.inc({ type: "image", status: "error" });
-    throw new Error(`Upload failed: ${error.message}`);
+    throw new Error("Upload failed. Please try again.");
   }
 
   const { data: urlData } = supabase.storage
@@ -39,16 +54,23 @@ async function uploadFileToStorage(file: File): Promise<string> {
 
 async function uploadBase64ToStorage(base64DataUrl: string): Promise<string> {
   const supabase = getServiceSupabase();
-  // Extract mime type and base64 data from data URL
   const matches = base64DataUrl.match(/^data:(.+);base64,(.+)$/);
   if (!matches) throw new Error("Invalid base64 data URL");
 
   const mimeType = matches[1];
   const base64Data = matches[2];
-  const ext = mimeType.split("/")[1] || "jpeg";
 
-  // Convert base64 to Buffer
+  const allowedMimes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  if (!allowedMimes.includes(mimeType)) {
+    throw new Error("File type not allowed");
+  }
+
+  const ext = mimeType.split("/")[1] || "jpeg";
   const buffer = Buffer.from(base64Data, "base64");
+
+  if (buffer.length > 5 * 1024 * 1024) {
+    throw new Error("File size exceeds maximum of 5MB");
+  }
 
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
   const filePath = `uploads/${fileName}`;
@@ -63,7 +85,7 @@ async function uploadBase64ToStorage(base64DataUrl: string): Promise<string> {
 
   if (error) {
     fileUploadsTotal.inc({ type: "image", status: "error" });
-    throw new Error(`Upload failed: ${error.message}`);
+    throw new Error("Upload failed. Please try again.");
   }
 
   const { data: urlData } = supabase.storage
@@ -79,36 +101,34 @@ async function uploadBase64ToStorage(base64DataUrl: string): Promise<string> {
 export const updateHomeContent = trackServerAction("updateHomeContent", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
-  const roles = (formData.get("roles") as string).split(",").map(r => r.trim());
-  let cv_url = formData.get("cv_url") as string;
-  const greeting = formData.get("greeting") as string;
-  const description = formData.get("description") as string;
 
-  // Handle resume/CV PDF upload (overrides text URL if file provided)
+  const roles = validateArray(formData.get("roles"), "roles");
+  const cv_url = validateUrl(formData.get("cv_url"), "cv_url");
+  const greeting = validateString(formData.get("greeting"), "greeting");
+  const description = validateString(formData.get("description"), "description", 5000);
+
   const resumeFile = formData.get("resume_file") as File;
+  let finalCvUrl = cv_url;
   if (resumeFile && resumeFile.size > 0) {
-    cv_url = await uploadFileToStorage(resumeFile);
+    finalCvUrl = await uploadFileToStorage(resumeFile);
   }
 
-  // Handle cropped profile image (base64 from interactive cropper)
   const base64Image = formData.get("profile_image_base64") as string;
   const existingUrl = formData.get("existing_profile_image_url") as string;
   let finalImageUrl: string | undefined;
 
   if (base64Image) {
-    // User cropped a new image — upload the cropped result
     finalImageUrl = await uploadBase64ToStorage(base64Image);
   } else if (existingUrl) {
-    // No new crop, keep the existing image (strip any old ?pos= params)
     finalImageUrl = existingUrl.split("?pos=")[0];
   }
 
-  const updateData: any = { roles, cv_url, greeting, description };
+  const updateData: any = { roles, cv_url: finalCvUrl, greeting, description };
   if (finalImageUrl) updateData.profile_image_url = finalImageUrl;
 
   const { error } = await supabase.from("home_content").update(updateData).eq("id", id);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to update home content");
+
   contentUpdatesTotal.inc({ content_type: "home", operation: "update" });
   revalidatePath("/");
   revalidatePath("/admin/home");
@@ -119,10 +139,16 @@ export const updateHomeContent = trackServerAction("updateHomeContent", async (i
 export const updateAboutContent = trackServerAction("updateAboutContent", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
-  const rawParagraphs = formData.get("paragraphs") as string;
-  const paragraphs = rawParagraphs.split(/\n\n+/).map(p => p.trim()).filter(p => p.length > 0);
-  
-  // Handle cropped profile image (base64 from interactive cropper)
+
+  const rawParagraphs = validateString(formData.get("paragraphs"), "paragraphs", 10000);
+  const paragraphs = rawParagraphs.split(/\n\n+/).map((p) => p.trim()).filter((p) => p.length > 0);
+
+  for (const p of paragraphs) {
+    if (p.length > 2000) {
+      throw new Error("Each paragraph must not exceed 2000 characters");
+    }
+  }
+
   const base64Image = formData.get("profile_image_base64") as string;
   const existingUrl = formData.get("existing_profile_image_url") as string;
   let finalImageUrl: string | undefined;
@@ -137,8 +163,8 @@ export const updateAboutContent = trackServerAction("updateAboutContent", async 
   if (finalImageUrl) updateData.profile_image_url = finalImageUrl;
 
   const { error } = await supabase.from("about_content").update(updateData).eq("id", id);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to update about content");
+
   contentUpdatesTotal.inc({ content_type: "about", operation: "update" });
   revalidatePath("/about");
   revalidatePath("/admin/about");
@@ -148,20 +174,20 @@ export const updateAboutContent = trackServerAction("updateAboutContent", async 
 export const addSkill = trackServerAction("addSkill", async (formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
-  const name = formData.get("name") as string;
-  const category = formData.get("category") as string;
-  const level = formData.get("level") as string;
 
-  // Handle icon upload or URL
-  let icon_url = formData.get("icon_url") as string;
+  const name = validateRequired(formData.get("name"), "name");
+  const category = validateRequired(formData.get("category"), "category");
+  const level = validateRequired(formData.get("level"), "level");
+
+  let icon_url = validateUrl(formData.get("icon_url"), "icon_url");
   const iconFile = formData.get("icon_file") as File;
   if (iconFile && iconFile.size > 0) {
     icon_url = await uploadFileToStorage(iconFile);
   }
 
   const { error } = await supabase.from("skills").insert([{ name, category, level, icon_url }]);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to add skill");
+
   contentUpdatesTotal.inc({ content_type: "skill", operation: "create" });
   revalidatePath("/about");
   revalidatePath("/admin/about");
@@ -170,13 +196,14 @@ export const addSkill = trackServerAction("addSkill", async (formData: FormData)
 export const updateSkill = trackServerAction("updateSkill", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
-  const name = formData.get("name") as string;
-  const category = formData.get("category") as string;
-  const level = formData.get("level") as string;
+
+  const name = validateRequired(formData.get("name"), "name");
+  const category = validateRequired(formData.get("category"), "category");
+  const level = validateRequired(formData.get("level"), "level");
 
   const updateData: any = { name, category, level };
 
-  let icon_url = formData.get("icon_url") as string;
+  let icon_url = validateUrl(formData.get("icon_url"), "icon_url");
   const iconFile = formData.get("icon_file") as File;
   if (iconFile && iconFile.size > 0) {
     updateData.icon_url = await uploadFileToStorage(iconFile);
@@ -185,8 +212,8 @@ export const updateSkill = trackServerAction("updateSkill", async (id: string, f
   }
 
   const { error } = await supabase.from("skills").update(updateData).eq("id", id);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to update skill");
+
   contentUpdatesTotal.inc({ content_type: "skill", operation: "update" });
   revalidatePath("/about");
   revalidatePath("/admin/about");
@@ -196,8 +223,8 @@ export const deleteSkill = trackServerAction("deleteSkill", async (id: string) =
   await verifyAuth();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("skills").delete().eq("id", id);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to delete skill");
+
   contentUpdatesTotal.inc({ content_type: "skill", operation: "delete" });
   revalidatePath("/about");
   revalidatePath("/admin/about");
@@ -207,22 +234,22 @@ export const deleteSkill = trackServerAction("deleteSkill", async (id: string) =
 export const addProject = trackServerAction("addProject", async (formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const tech_stack = (formData.get("tech_stack") as string).split(",").map(t => t.trim());
-  const github_url = formData.get("github_url") as string;
-  const demo_url = formData.get("demo_url") as string;
 
-  // Handle image upload
-  let image_url = formData.get("image_url") as string || "";
+  const title = validateRequired(formData.get("title"), "title");
+  const description = validateString(formData.get("description"), "description");
+  const tech_stack = validateArray(formData.get("tech_stack"), "tech_stack");
+  const github_url = validateUrl(formData.get("github_url"), "github_url");
+  const demo_url = validateUrl(formData.get("demo_url"), "demo_url");
+
+  let image_url = validateUrl(formData.get("image_url"), "image_url") || "";
   const imageFile = formData.get("image_file") as File;
   if (imageFile && imageFile.size > 0) {
     image_url = await uploadFileToStorage(imageFile);
   }
 
   const { error } = await supabase.from("projects").insert([{ title, description, image_url, tech_stack, github_url, demo_url }]);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to add project");
+
   contentUpdatesTotal.inc({ content_type: "project", operation: "create" });
   revalidatePath("/portofolio");
   revalidatePath("/admin/portofolio");
@@ -231,15 +258,16 @@ export const addProject = trackServerAction("addProject", async (formData: FormD
 export const updateProject = trackServerAction("updateProject", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const tech_stack = (formData.get("tech_stack") as string).split(",").map(t => t.trim());
-  const github_url = formData.get("github_url") as string;
-  const demo_url = formData.get("demo_url") as string;
+
+  const title = validateRequired(formData.get("title"), "title");
+  const description = validateString(formData.get("description"), "description");
+  const tech_stack = validateArray(formData.get("tech_stack"), "tech_stack");
+  const github_url = validateUrl(formData.get("github_url"), "github_url");
+  const demo_url = validateUrl(formData.get("demo_url"), "demo_url");
 
   const updateData: any = { title, description, tech_stack, github_url, demo_url };
 
-  let image_url = formData.get("image_url") as string;
+  let image_url = validateUrl(formData.get("image_url"), "image_url");
   const imageFile = formData.get("image_file") as File;
   if (imageFile && imageFile.size > 0) {
     updateData.image_url = await uploadFileToStorage(imageFile);
@@ -248,8 +276,8 @@ export const updateProject = trackServerAction("updateProject", async (id: strin
   }
 
   const { error } = await supabase.from("projects").update(updateData).eq("id", id);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to update project");
+
   contentUpdatesTotal.inc({ content_type: "project", operation: "update" });
   revalidatePath("/portofolio");
   revalidatePath("/admin/portofolio");
@@ -259,8 +287,8 @@ export const deleteProject = trackServerAction("deleteProject", async (id: strin
   await verifyAuth();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("projects").delete().eq("id", id);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to delete project");
+
   contentUpdatesTotal.inc({ content_type: "project", operation: "delete" });
   revalidatePath("/portofolio");
   revalidatePath("/admin/portofolio");
@@ -270,22 +298,22 @@ export const deleteProject = trackServerAction("deleteProject", async (id: strin
 export const addCertification = trackServerAction("addCertification", async (formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
-  const title = formData.get("title") as string;
-  const issuer = formData.get("issuer") as string;
-  const issued_date = formData.get("issued_date") as string;
-  const credential_url = formData.get("credential_url") as string;
-  const description = formData.get("description") as string;
 
-  // Handle image upload
-  let image_url = formData.get("image_url") as string || "";
+  const title = validateRequired(formData.get("title"), "title");
+  const issuer = validateRequired(formData.get("issuer"), "issuer");
+  const issued_date = validateString(formData.get("issued_date"), "issued_date");
+  const credential_url = validateUrl(formData.get("credential_url"), "credential_url");
+  const description = validateString(formData.get("description"), "description");
+
+  let image_url = validateUrl(formData.get("image_url"), "image_url") || "";
   const imageFile = formData.get("image_file") as File;
   if (imageFile && imageFile.size > 0) {
     image_url = await uploadFileToStorage(imageFile);
   }
 
   const { error } = await supabase.from("certifications").insert([{ title, issuer, issued_date, image_url, credential_url, description }]);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to add certification");
+
   contentUpdatesTotal.inc({ content_type: "certification", operation: "create" });
   revalidatePath("/certification");
   revalidatePath("/admin/certification");
@@ -294,15 +322,16 @@ export const addCertification = trackServerAction("addCertification", async (for
 export const updateCertification = trackServerAction("updateCertification", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
-  const title = formData.get("title") as string;
-  const issuer = formData.get("issuer") as string;
-  const issued_date = formData.get("issued_date") as string;
-  const credential_url = formData.get("credential_url") as string;
-  const description = formData.get("description") as string;
+
+  const title = validateRequired(formData.get("title"), "title");
+  const issuer = validateRequired(formData.get("issuer"), "issuer");
+  const issued_date = validateString(formData.get("issued_date"), "issued_date");
+  const credential_url = validateUrl(formData.get("credential_url"), "credential_url");
+  const description = validateString(formData.get("description"), "description");
 
   const updateData: any = { title, issuer, issued_date, credential_url, description };
 
-  let image_url = formData.get("image_url") as string;
+  let image_url = validateUrl(formData.get("image_url"), "image_url");
   const imageFile = formData.get("image_file") as File;
   if (imageFile && imageFile.size > 0) {
     updateData.image_url = await uploadFileToStorage(imageFile);
@@ -311,8 +340,8 @@ export const updateCertification = trackServerAction("updateCertification", asyn
   }
 
   const { error } = await supabase.from("certifications").update(updateData).eq("id", id);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to update certification");
+
   contentUpdatesTotal.inc({ content_type: "certification", operation: "update" });
   revalidatePath("/certification");
   revalidatePath("/admin/certification");
@@ -322,8 +351,8 @@ export const deleteCertification = trackServerAction("deleteCertification", asyn
   await verifyAuth();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("certifications").delete().eq("id", id);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to delete certification");
+
   contentUpdatesTotal.inc({ content_type: "certification", operation: "delete" });
   revalidatePath("/certification");
   revalidatePath("/admin/certification");
@@ -333,16 +362,17 @@ export const deleteCertification = trackServerAction("deleteCertification", asyn
 export const addProduct = trackServerAction("addProduct", async (formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
-  const name = formData.get("name") as string;
-  const short_name = formData.get("short_name") as string;
-  const description = formData.get("description") as string;
-  const price = Number(formData.get("price"));
-  const timeline = formData.get("timeline") as string;
-  const includes = (formData.get("includes") as string).split(",").map(i => i.trim()).filter(i => i);
+
+  const name = validateRequired(formData.get("name"), "name");
+  const short_name = validateRequired(formData.get("short_name"), "short_name");
+  const description = validateString(formData.get("description"), "description");
+  const price = validateNumber(formData.get("price"), "price", { min: 0 });
+  const timeline = validateString(formData.get("timeline"), "timeline");
+  const includes = validateArray(formData.get("includes"), "includes");
 
   const { error } = await supabase.from("products").insert([{ name, short_name, description, price, timeline, includes }]);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to add product");
+
   contentUpdatesTotal.inc({ content_type: "product", operation: "create" });
   revalidatePath("/");
   revalidatePath("/admin/products");
@@ -351,16 +381,17 @@ export const addProduct = trackServerAction("addProduct", async (formData: FormD
 export const updateProduct = trackServerAction("updateProduct", async (id: string, formData: FormData) => {
   await verifyAuth();
   const supabase = getServiceSupabase();
-  const name = formData.get("name") as string;
-  const short_name = formData.get("short_name") as string;
-  const description = formData.get("description") as string;
-  const price = Number(formData.get("price"));
-  const timeline = formData.get("timeline") as string;
-  const includes = (formData.get("includes") as string).split(",").map(i => i.trim()).filter(i => i);
+
+  const name = validateRequired(formData.get("name"), "name");
+  const short_name = validateRequired(formData.get("short_name"), "short_name");
+  const description = validateString(formData.get("description"), "description");
+  const price = validateNumber(formData.get("price"), "price", { min: 0 });
+  const timeline = validateString(formData.get("timeline"), "timeline");
+  const includes = validateArray(formData.get("includes"), "includes");
 
   const { error } = await supabase.from("products").update({ name, short_name, description, price, timeline, includes }).eq("id", id);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to update product");
+
   contentUpdatesTotal.inc({ content_type: "product", operation: "update" });
   revalidatePath("/");
   revalidatePath("/admin/products");
@@ -370,8 +401,8 @@ export const deleteProduct = trackServerAction("deleteProduct", async (id: strin
   await verifyAuth();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("products").delete().eq("id", id);
-  if (error) throw new Error(error.message);
-  
+  if (error) throw new Error("Failed to delete product");
+
   contentUpdatesTotal.inc({ content_type: "product", operation: "delete" });
   revalidatePath("/");
   revalidatePath("/admin/products");

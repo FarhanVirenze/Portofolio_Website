@@ -173,7 +173,8 @@ export async function POST(request: Request) {
     });
 
     if (insertError) {
-      return Response.json({ message: insertError.message }, { status: 500 });
+      console.error("Checkout insert error:", insertError);
+      return Response.json({ message: "Failed to process checkout. Please try again." }, { status: 500 });
     }
 
     const duitkuResponse = await fetch(createInvoiceUrl, {
@@ -202,7 +203,6 @@ export async function POST(request: Request) {
       return Response.json(
         {
           message: data?.statusMessage || data?.Message || "Duitku belum bisa membuat transaksi.",
-          detail: data,
         },
         { status: duitkuResponse.status || 502 }
       );
@@ -225,8 +225,9 @@ export async function POST(request: Request) {
       statusMessage: data.statusMessage,
     });
   } catch (error) {
+    console.error("Checkout error:", error);
     return Response.json(
-      { message: error instanceof Error ? error.message : "Checkout gagal diproses." },
+      { message: "Checkout failed. Please try again." },
       { status: 500 }
     );
   }

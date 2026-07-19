@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,29 @@ import { updateAdminPassword } from "@/app/actions/admin-auth";
 import { showToast } from "@/components/toast";
 
 export default function AdminSettingsPage() {
-  const [email, setEmail] = useState("farhanvirenze18@gmail.com");
+  const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingEmail, setIsFetchingEmail] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchEmail() {
+      try {
+        const response = await fetch("/api/admin/email");
+        if (response.ok) {
+          const data = await response.json();
+          setEmail(data.email || "");
+        }
+      } catch {
+        setEmail("");
+      } finally {
+        setIsFetchingEmail(false);
+      }
+    }
+    fetchEmail();
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -53,12 +71,20 @@ export default function AdminSettingsPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Email Admin</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              {isFetchingEmail ? (
+                <div className="flex items-center gap-2 h-10 px-3 bg-muted/50 rounded-xl">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm text-muted-foreground">Loading...</span>
+                </div>
+              ) : (
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="admin@example.com"
+                />
+              )}
             </div>
 
             <div className="space-y-2">
@@ -92,7 +118,7 @@ export default function AdminSettingsPage() {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={isLoading || !newPassword}>
+            <Button type="submit" className="w-full" disabled={isLoading || !newPassword || isFetchingEmail}>
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Shield className="h-4 w-4" />}
               {isLoading ? "Menghash & Update..." : "Hash & Simpan Password"}
             </Button>
@@ -109,7 +135,6 @@ export default function AdminSettingsPage() {
           <p>Format hash: <code className="bg-muted px-1 rounded">$2a$10$...</code></p>
           <p>Admin login mendukung:</p>
           <ul className="list-disc list-inside ml-2 space-y-1">
-            <li>Password plaintext (legacy — fallback)</li>
             <li>Password bcrypt hashed (recommended)</li>
           </ul>
         </CardContent>

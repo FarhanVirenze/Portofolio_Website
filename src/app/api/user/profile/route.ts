@@ -40,7 +40,8 @@ export async function GET() {
     .single();
 
   if (error && error.code !== "PGRST116") {
-    return Response.json({ message: error.message }, { status: 500 });
+    console.error("Profile fetch error:", error);
+    return Response.json({ message: "Failed to fetch profile" }, { status: 500 });
   }
 
   const profile = data ?? {
@@ -89,7 +90,8 @@ export async function PUT(request: Request) {
     .single();
 
   if (error) {
-    return Response.json({ message: error.message }, { status: 500 });
+    console.error("Profile update error:", error);
+    return Response.json({ message: "Failed to update profile" }, { status: 500 });
   }
 
   return Response.json({ profile: data });
