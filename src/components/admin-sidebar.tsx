@@ -22,7 +22,7 @@ export function AdminSidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 min-h-screen bg-card border-r border-border">
+      <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 bg-card border-r border-border">
         <div className="p-6 border-b border-border">
           <Link href="/admin/dashboard" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
