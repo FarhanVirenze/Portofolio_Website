@@ -56,7 +56,7 @@ export default async function AdminDashboardPage() {
     hasHomeContent = (h.data && h.data.length > 0) || false;
 
     // Transaction stats
-    const txResult = await supabase.from("checkout_transactions").select("amount, status, created_at, merchant_order_id, product_name, customer_name, email, payment_method, paid_at");
+    const txResult = await supabase.from("checkout_transactions").select("id, amount, status, created_at, merchant_order_id, product_name, customer_name, email, payment_method, paid_at");
     const txRows = txResult.data || [];
 
     totalTransactions = txRows.length;

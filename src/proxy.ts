@@ -39,7 +39,7 @@ function verifySessionToken(token: string): { valid: boolean; email?: string } {
   }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
