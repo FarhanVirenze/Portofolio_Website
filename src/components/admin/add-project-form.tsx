@@ -35,38 +35,38 @@ export function AddProjectForm() {
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="project-title" className="text-sm font-medium">Project Title</label>
-            <Input id="project-title" name="title" placeholder="e.g. E-Commerce Platform" required />
+            <Input id="project-title" name="title" autoComplete="off" placeholder="e.g. E-Commerce Platform" required />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="project-description" className="text-sm font-medium">Description</label>
-            <Textarea id="project-description" name="description" placeholder="Short description about the project..." rows={3} className="resize-none" required />
+            <Textarea id="project-description" name="description" autoComplete="off" placeholder="Short description about the project..." rows={3} className="resize-none" required />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="project-tech-stack" className="text-sm font-medium">Tech Stack (comma separated)</label>
-            <Input id="project-tech-stack" name="tech_stack" placeholder="e.g. React, Node.js, PostgreSQL" required />
+            <Input id="project-tech-stack" name="tech_stack" autoComplete="off" placeholder="e.g. React, Node.js, PostgreSQL" required />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label htmlFor="project-github-url" className="text-sm font-medium">GitHub URL</label>
-              <Input id="project-github-url" name="github_url" placeholder="https://github.com/..." />
+              <Input id="project-github-url" name="github_url" autoComplete="off" placeholder="https://github.com/..." />
             </div>
             <div className="space-y-2">
               <label htmlFor="project-demo-url" className="text-sm font-medium">Demo URL</label>
-              <Input id="project-demo-url" name="demo_url" placeholder="https://..." />
+              <Input id="project-demo-url" name="demo_url" autoComplete="off" placeholder="https://..." />
             </div>
           </div>
 
           <div className="space-y-2 border-t pt-2 border-border">
             <label htmlFor="project-image-file" className="text-sm font-medium">Project Image</label>
-            <Input id="project-image-file" name="image_file" type="file" accept="image/*" className="cursor-pointer" />
+            <Input id="project-image-file" name="image_file" type="file" accept="image/*" autoComplete="off" className="cursor-pointer" />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="project-image-url" className="text-sm font-medium">Or Paste Image URL</label>
-            <Input id="project-image-url" name="image_url" placeholder="https://..." />
+            <Input id="project-image-url" name="image_url" autoComplete="off" placeholder="https://..." />
           </div>
 
           <Button type="submit" className="w-full mt-2" disabled={isLoading}>

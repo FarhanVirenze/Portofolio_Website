@@ -38,37 +38,37 @@ export function EditCertificationModal({ cert }: { cert: any }) {
         >
           <div className="space-y-2">
             <label htmlFor="edit-cert-title" className="text-sm font-medium">Certification Title</label>
-            <Input id="edit-cert-title" name="title" defaultValue={cert.title} required />
+            <Input id="edit-cert-title" name="title" autoComplete="off" defaultValue={cert.title} required />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="edit-cert-issuer" className="text-sm font-medium">Issuer / Organization</label>
-            <Input id="edit-cert-issuer" name="issuer" defaultValue={cert.issuer} required />
+            <Input id="edit-cert-issuer" name="issuer" autoComplete="off" defaultValue={cert.issuer} required />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="edit-cert-issued-date" className="text-sm font-medium">Date Issued</label>
-            <Input id="edit-cert-issued-date" name="issued_date" type="date" defaultValue={cert.issued_date} required />
+            <Input id="edit-cert-issued-date" name="issued_date" type="date" autoComplete="off" defaultValue={cert.issued_date} required />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="edit-cert-description" className="text-sm font-medium">Description</label>
-            <Textarea id="edit-cert-description" name="description" defaultValue={cert.description} rows={3} className="resize-none" required />
+            <Textarea id="edit-cert-description" name="description" autoComplete="off" defaultValue={cert.description} rows={3} className="resize-none" required />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="edit-cert-credential-url" className="text-sm font-medium">Credential URL</label>
-            <Input id="edit-cert-credential-url" name="credential_url" defaultValue={cert.credential_url || ""} />
+            <Input id="edit-cert-credential-url" name="credential_url" autoComplete="off" defaultValue={cert.credential_url || ""} />
           </div>
 
           <div className="space-y-2 border-t pt-2 border-border">
             <label htmlFor="edit-cert-image-file" className="text-sm font-medium">Certificate Image (Upload File to replace)</label>
-            <Input id="edit-cert-image-file" name="image_file" type="file" accept="image/*" className="cursor-pointer" />
+            <Input id="edit-cert-image-file" name="image_file" type="file" accept="image/*" autoComplete="off" className="cursor-pointer" />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="edit-cert-image-url" className="text-sm font-medium">Or Paste Image URL</label>
-            <Input id="edit-cert-image-url" name="image_url" defaultValue={cert.image_url || ""} />
+            <Input id="edit-cert-image-url" name="image_url" autoComplete="off" defaultValue={cert.image_url || ""} />
           </div>
 
           <div className="flex justify-end gap-2 pt-4 border-t border-border mt-4">

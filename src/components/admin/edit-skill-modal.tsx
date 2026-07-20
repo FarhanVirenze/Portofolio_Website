@@ -36,12 +36,12 @@ export function EditSkillModal({ skill }: { skill: any }) {
         >
           <div className="space-y-2">
             <label htmlFor="edit-skill-name" className="text-sm font-medium">Skill Name</label>
-            <Input id="edit-skill-name" name="name" defaultValue={skill.name} required />
+            <Input id="edit-skill-name" name="name" autoComplete="off" defaultValue={skill.name} required />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="edit-skill-category" className="text-sm font-medium">Category</label>
-            <select id="edit-skill-category" name="category" defaultValue={skill.category} className="w-full bg-background text-foreground border border-input rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" required>
+            <select id="edit-skill-category" name="category" defaultValue={skill.category} autoComplete="off" className="w-full bg-background text-foreground border border-input rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" required>
               <option value="tech">Tech Stack</option>
               <option value="tool">Tools</option>
             </select>
@@ -49,17 +49,17 @@ export function EditSkillModal({ skill }: { skill: any }) {
 
           <div className="space-y-2">
             <label htmlFor="edit-skill-level" className="text-sm font-medium">Level / Proficiency</label>
-            <Input id="edit-skill-level" name="level" defaultValue={skill.level} required />
+            <Input id="edit-skill-level" name="level" autoComplete="off" defaultValue={skill.level} required />
           </div>
 
           <div className="space-y-2 border-t pt-2 border-border">
             <label htmlFor="edit-skill-icon-file" className="text-sm font-medium">Icon (Upload File to replace)</label>
-            <Input id="edit-skill-icon-file" name="icon_file" type="file" accept="image/*" className="cursor-pointer" />
+            <Input id="edit-skill-icon-file" name="icon_file" type="file" accept="image/*" autoComplete="off" className="cursor-pointer" />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="edit-skill-icon-url" className="text-sm font-medium">Or Paste Icon URL</label>
-            <Input id="edit-skill-icon-url" name="icon_url" defaultValue={skill.icon_url || ""} />
+            <Input id="edit-skill-icon-url" name="icon_url" autoComplete="off" defaultValue={skill.icon_url || ""} />
           </div>
 
           <div className="flex justify-end gap-2 pt-4 border-t border-border mt-4">

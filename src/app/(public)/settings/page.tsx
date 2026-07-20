@@ -170,29 +170,38 @@ function SettingsPageInner() {
           </div>
         ) : (
           <form className="mt-7 space-y-4" onSubmit={saveProfile}>
-            <label className="block space-y-2 text-sm font-medium text-foreground">
+            <label htmlFor="settings-name" className="block space-y-2 text-sm font-medium text-foreground">
               Nama Lengkap
               <Input
+                id="settings-name"
+                name="full_name"
+                autoComplete="name"
                 value={profile.full_name}
                 onChange={(event) => setProfile((current) => ({ ...current, full_name: event.target.value }))}
                 required
               />
             </label>
-            <label className="block space-y-2 text-sm font-medium text-foreground">
+            <label htmlFor="settings-email" className="block space-y-2 text-sm font-medium text-foreground">
               Email
-              <Input value={profile.email} disabled />
+              <Input id="settings-email" name="email" autoComplete="email" value={profile.email} disabled />
             </label>
-            <label className="block space-y-2 text-sm font-medium text-foreground">
+            <label htmlFor="settings-phone" className="block space-y-2 text-sm font-medium text-foreground">
               Nomor Telepon
               <Input
+                id="settings-phone"
+                name="phone"
+                autoComplete="tel"
                 value={profile.phone}
                 onChange={(event) => setProfile((current) => ({ ...current, phone: event.target.value }))}
                 required
               />
             </label>
-            <label className="block space-y-2 text-sm font-medium text-foreground">
+            <label htmlFor="settings-address" className="block space-y-2 text-sm font-medium text-foreground">
               Alamat
               <Textarea
+                id="settings-address"
+                name="address"
+                autoComplete="street-address"
                 value={profile.address}
                 onChange={(event) => setProfile((current) => ({ ...current, address: event.target.value }))}
                 required
@@ -228,9 +237,12 @@ function SettingsPageInner() {
                 Ubah Password
               </h2>
               <form className="mt-4 space-y-4" onSubmit={changePassword}>
-                <label className="block space-y-2 text-sm font-medium text-foreground">
+                <label htmlFor="settings-password" className="block space-y-2 text-sm font-medium text-foreground">
                   Password Baru
                   <Input
+                    id="settings-password"
+                    name="newPassword"
+                    autoComplete="new-password"
                     type="password"
                     value={newPassword}
                     onChange={(event) => setNewPassword(event.target.value)}

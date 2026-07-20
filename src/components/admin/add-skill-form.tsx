@@ -34,12 +34,12 @@ export function AddSkillForm() {
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="skill-name" className="text-sm font-medium">Skill Name</label>
-            <Input id="skill-name" name="name" placeholder="e.g. Next.js, Figma" required />
+            <Input id="skill-name" name="name" autoComplete="off" placeholder="e.g. Next.js, Figma" required />
           </div>
 
           <div className="space-y-2">
             <label htmlFor="skill-category" className="text-sm font-medium">Category</label>
-            <select id="skill-category" name="category" className="w-full bg-background text-foreground border border-input rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" required>
+            <select id="skill-category" name="category" autoComplete="off" className="w-full bg-background text-foreground border border-input rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" required>
               <option value="tech">Tech Stack (Programming Languages, Frameworks)</option>
               <option value="tool">Tools (Design tools, Editors, Platforms)</option>
             </select>
@@ -47,18 +47,18 @@ export function AddSkillForm() {
 
           <div className="space-y-2">
             <label htmlFor="skill-level" className="text-sm font-medium">Level / Proficiency</label>
-            <Input id="skill-level" name="level" placeholder="e.g. Intermediate, Advanced" required />
+            <Input id="skill-level" name="level" autoComplete="off" placeholder="e.g. Intermediate, Advanced" required />
           </div>
 
           <div className="space-y-2 border-t pt-2 border-border">
             <label htmlFor="skill-icon-file" className="text-sm font-medium">Icon (Upload File)</label>
-            <Input id="skill-icon-file" name="icon_file" type="file" accept="image/*" className="cursor-pointer" />
+            <Input id="skill-icon-file" name="icon_file" type="file" accept="image/*" autoComplete="off" className="cursor-pointer" />
             <span className="text-xs text-muted-foreground">Select a custom SVG/PNG icon.</span>
           </div>
 
           <div className="space-y-2">
             <label htmlFor="skill-icon-url" className="text-sm font-medium">Or Paste Icon URL</label>
-            <Input id="skill-icon-url" name="icon_url" placeholder="https://cdn.jsdelivr.net/gh/devicons/devicon/..." />
+            <Input id="skill-icon-url" name="icon_url" autoComplete="off" placeholder="https://cdn.jsdelivr.net/gh/devicons/devicon/..." />
           </div>
 
           <Button type="submit" className="w-full mt-2" disabled={isLoading}>

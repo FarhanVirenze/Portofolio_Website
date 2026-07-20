@@ -59,6 +59,7 @@ export default async function AdminAboutPage() {
                       <Textarea 
                         id="paragraphs"
                         name="paragraphs" 
+                        autoComplete="off"
                         defaultValue={aboutContent.paragraphs?.join("\n\n") || ""} 
                         placeholder="Write your biography here. Separate paragraphs with a blank line (press Enter twice)." 
                         rows={10} 

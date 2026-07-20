@@ -106,12 +106,15 @@ function RegisterPageInner() {
 
             <form className="space-y-4" onSubmit={register}>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Nama Lengkap</label>
+                <label htmlFor="reg-fullname" className="text-sm font-medium text-foreground">Nama Lengkap</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
                     <User className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                   </div>
                   <Input
+                    id="reg-fullname"
+                    name="full_name"
+                    autoComplete="name"
                     value={fullName}
                     onChange={(event) => setFullName(event.target.value)}
                     placeholder="Nama lengkap kamu"
@@ -122,12 +125,15 @@ function RegisterPageInner() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Email</label>
+                <label htmlFor="reg-email" className="text-sm font-medium text-foreground">Email</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
                     <Mail className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                   </div>
                   <Input
+                    id="reg-email"
+                    name="email"
+                    autoComplete="email"
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
@@ -139,12 +145,15 @@ function RegisterPageInner() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Nomor Telepon</label>
+                <label htmlFor="reg-phone" className="text-sm font-medium text-foreground">Nomor Telepon</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
                     <Phone className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                   </div>
                   <Input
+                    id="reg-phone"
+                    name="phone"
+                    autoComplete="tel"
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
                     placeholder="08xxxxxxxxxx"
@@ -155,12 +164,15 @@ function RegisterPageInner() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Alamat</label>
+                <label htmlFor="reg-address" className="text-sm font-medium text-foreground">Alamat</label>
                 <div className="relative group">
                   <div className="absolute top-3 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
                     <MapPin className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                   </div>
                   <Textarea
+                    id="reg-address"
+                    name="address"
+                    autoComplete="street-address"
                     value={address}
                     onChange={(event) => setAddress(event.target.value)}
                     placeholder="Alamat lengkap kamu"
@@ -171,12 +183,15 @@ function RegisterPageInner() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Password</label>
+                <label htmlFor="reg-password" className="text-sm font-medium text-foreground">Password</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
                     <Lock className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                   </div>
                   <Input
+                    id="reg-password"
+                    name="password"
+                    autoComplete="new-password"
                     type="password"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}

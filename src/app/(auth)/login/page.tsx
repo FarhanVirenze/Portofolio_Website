@@ -134,6 +134,9 @@ function LoginPageInner() {
                   <Mail className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                 </div>
                 <Input
+                  id="reset-email"
+                  name="email"
+                  autoComplete="email"
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
@@ -224,12 +227,15 @@ function LoginPageInner() {
 
             <form className="space-y-4" onSubmit={loginWithEmail}>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Email</label>
+                <label htmlFor="login-email" className="text-sm font-medium text-foreground">Email</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
                     <Mail className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                   </div>
                   <Input
+                    id="login-email"
+                    name="email"
+                    autoComplete="email"
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
@@ -241,12 +247,15 @@ function LoginPageInner() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Password</label>
+                <label htmlFor="login-password" className="text-sm font-medium text-foreground">Password</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
                     <Lock className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                   </div>
                   <Input
+                    id="login-password"
+                    name="password"
+                    autoComplete="current-password"
                     type="password"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}

@@ -80,6 +80,7 @@ export default function AdminSettingsPage() {
                 <Input
                   id="admin-email"
                   type="email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -94,6 +95,7 @@ export default function AdminSettingsPage() {
                 <Input
                   id="admin-password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   minLength={6}
