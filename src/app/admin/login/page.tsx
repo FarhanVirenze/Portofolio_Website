@@ -81,6 +81,7 @@ export default function AdminLogin() {
                     name="email"
                     type="email"
                     placeholder="Admin Email"
+                    autoComplete="email"
                     required
                     className="pl-12 h-12 bg-background/50 border-border/50 rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                   />
@@ -96,6 +97,7 @@ export default function AdminLogin() {
                     name="password"
                     type="password"
                     placeholder="Password"
+                    autoComplete="current-password"
                     required
                     className="pl-12 h-12 bg-background/50 border-border/50 rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                   />
