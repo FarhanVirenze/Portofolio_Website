@@ -70,22 +70,27 @@ export default function AdminSettingsPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="admin-email" className="text-sm font-medium">Email Admin</label>
               {isFetchingEmail ? (
-                <div className="flex items-center gap-2 h-10 px-3 bg-muted/50 rounded-xl">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm text-muted-foreground">Loading...</span>
-                </div>
+                <>
+                  <label className="text-sm font-medium">Email Admin</label>
+                  <div className="flex items-center gap-2 h-10 px-3 bg-muted/50 rounded-xl">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Loading...</span>
+                  </div>
+                </>
               ) : (
-                <Input
-                  id="admin-email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="admin@example.com"
-                />
+                <>
+                  <label htmlFor="admin-email" className="text-sm font-medium">Email Admin</label>
+                  <Input
+                    id="admin-email"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="admin@example.com"
+                  />
+                </>
               )}
             </div>
 
