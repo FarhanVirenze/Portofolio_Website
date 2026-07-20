@@ -34,38 +34,38 @@ export function AddCertificationForm() {
       <CardContent>
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Certificate Title</label>
-            <Input name="title" placeholder="e.g. AWS Certified Solutions Architect" required />
+            <label htmlFor="cert-title" className="text-sm font-medium">Certificate Title</label>
+            <Input name="title" id="cert-title" placeholder="e.g. AWS Certified Solutions Architect" required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Issuer / Authority</label>
-            <Input name="issuer" placeholder="e.g. Amazon Web Services" required />
+            <label htmlFor="cert-issuer" className="text-sm font-medium">Issuer / Authority</label>
+            <Input name="issuer" id="cert-issuer" placeholder="e.g. Amazon Web Services" required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Issued Date</label>
-            <Input name="issued_date" type="date" required />
+            <label htmlFor="cert-issued-date" className="text-sm font-medium">Issued Date</label>
+            <Input name="issued_date" id="cert-issued-date" type="date" required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Credential Link</label>
-            <Input name="credential_url" placeholder="https://..." />
+            <label htmlFor="cert-credential-url" className="text-sm font-medium">Credential Link</label>
+            <Input name="credential_url" id="cert-credential-url" placeholder="https://..." />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Description (Optional)</label>
-            <Textarea name="description" placeholder="Brief summary..." rows={2} className="resize-none" />
+            <label htmlFor="cert-description" className="text-sm font-medium">Description (Optional)</label>
+            <Textarea name="description" id="cert-description" placeholder="Brief summary..." rows={2} className="resize-none" />
           </div>
 
           <div className="space-y-2 border-t pt-2 border-border">
-            <label className="text-sm font-medium">Certificate Image</label>
-            <Input name="image_file" type="file" accept="image/*" className="cursor-pointer" />
+            <label htmlFor="cert-image-file" className="text-sm font-medium">Certificate Image</label>
+            <Input name="image_file" id="cert-image-file" type="file" accept="image/*" className="cursor-pointer" />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Or Paste Image URL</label>
-            <Input name="image_url" placeholder="https://..." />
+            <label htmlFor="cert-image-url" className="text-sm font-medium">Or Paste Image URL</label>
+            <Input name="image_url" id="cert-image-url" placeholder="https://..." />
           </div>
 
           <Button type="submit" className="w-full mt-2" disabled={isLoading}>

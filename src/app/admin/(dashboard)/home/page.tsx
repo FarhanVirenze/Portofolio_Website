@@ -42,19 +42,19 @@ export default async function AdminHomePage() {
               <form action={updateHomeContent.bind(null, homeContent.id)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold">Greeting Intro</label>
-                    <Input name="greeting" defaultValue={homeContent.greeting || "Hey there, I'm"} placeholder="e.g. Hey there, I'm" />
+                    <label htmlFor="greeting" className="text-sm font-semibold">Greeting Intro</label>
+                    <Input id="greeting" name="greeting" defaultValue={homeContent.greeting || "Hey there, I'm"} placeholder="e.g. Hey there, I'm" />
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold">CV / Resume Link</label>
-                    <Input name="cv_url" defaultValue={homeContent.cv_url || ""} placeholder="e.g. /resume.pdf or Google Drive link" />
+                    <label htmlFor="cv_url" className="text-sm font-semibold">CV / Resume Link</label>
+                    <Input id="cv_url" name="cv_url" defaultValue={homeContent.cv_url || ""} placeholder="e.g. /resume.pdf or Google Drive link" />
                     <span className="text-xs text-muted-foreground">Paste a URL, or upload a PDF file below to auto-fill this field.</span>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold">Upload CV / Resume (PDF)</label>
-                    <Input name="resume_file" type="file" accept=".pdf,application/pdf" className="cursor-pointer file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90" />
+                    <label htmlFor="resume_file" className="text-sm font-semibold">Upload CV / Resume (PDF)</label>
+                    <Input id="resume_file" name="resume_file" type="file" accept=".pdf,application/pdf" className="cursor-pointer file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90" />
                     <span className="text-xs text-muted-foreground">Upload a PDF file (max 10MB). This will override the link above.</span>
                     {homeContent.cv_url && (
                       <div className="flex items-center gap-2 mt-1 text-xs text-primary">
@@ -67,18 +67,18 @@ export default async function AdminHomePage() {
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-semibold">Roles (comma separated for typewriter effect)</label>
-                    <Input name="roles" defaultValue={homeContent.roles?.join(", ") || ""} placeholder="Web Developer, UI/UX Designer, DevOps Engineer" required />
+                    <label htmlFor="roles" className="text-sm font-semibold">Roles (comma separated for typewriter effect)</label>
+                    <Input id="roles" name="roles" defaultValue={homeContent.roles?.join(", ") || ""} placeholder="Web Developer, UI/UX Designer, DevOps Engineer" required />
                     <span className="text-xs text-muted-foreground">Separate roles using commas. Example: "Full Stack Developer, Flutter Engineer"</span>
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-semibold">Short Biography Description</label>
-                    <Textarea name="description" defaultValue={homeContent.description || "Welcome to my website."} placeholder="Write a short summary about yourself..." rows={4} required className="resize-none" />
+                    <label htmlFor="description" className="text-sm font-semibold">Short Biography Description</label>
+                    <Textarea id="description" name="description" defaultValue={homeContent.description || "Welcome to my website."} placeholder="Write a short summary about yourself..." rows={4} required className="resize-none" />
                   </div>
 
                   <div className="space-y-3 md:col-span-2 border-t pt-4 border-border">
-                    <label className="text-sm font-semibold">Profile Photo</label>
+                    <label htmlFor="profile_image" className="text-sm font-semibold">Profile Photo</label>
                     <ImageCropperInput existingImageUrl={homeContent.profile_image_url || undefined} />
                   </div>
                 </div>

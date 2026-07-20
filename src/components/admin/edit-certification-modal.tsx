@@ -37,38 +37,38 @@ export function EditCertificationModal({ cert }: { cert: any }) {
           className="space-y-4 pt-4"
         >
           <div className="space-y-2">
-            <label className="text-sm font-medium">Certification Title</label>
-            <Input name="title" defaultValue={cert.title} required />
+            <label htmlFor="edit-cert-title" className="text-sm font-medium">Certification Title</label>
+            <Input id="edit-cert-title" name="title" defaultValue={cert.title} required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Issuer / Organization</label>
-            <Input name="issuer" defaultValue={cert.issuer} required />
+            <label htmlFor="edit-cert-issuer" className="text-sm font-medium">Issuer / Organization</label>
+            <Input id="edit-cert-issuer" name="issuer" defaultValue={cert.issuer} required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Date Issued</label>
-            <Input name="issued_date" type="date" defaultValue={cert.issued_date} required />
+            <label htmlFor="edit-cert-issued-date" className="text-sm font-medium">Date Issued</label>
+            <Input id="edit-cert-issued-date" name="issued_date" type="date" defaultValue={cert.issued_date} required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Description</label>
-            <Textarea name="description" defaultValue={cert.description} rows={3} className="resize-none" required />
+            <label htmlFor="edit-cert-description" className="text-sm font-medium">Description</label>
+            <Textarea id="edit-cert-description" name="description" defaultValue={cert.description} rows={3} className="resize-none" required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Credential URL</label>
-            <Input name="credential_url" defaultValue={cert.credential_url || ""} />
+            <label htmlFor="edit-cert-credential-url" className="text-sm font-medium">Credential URL</label>
+            <Input id="edit-cert-credential-url" name="credential_url" defaultValue={cert.credential_url || ""} />
           </div>
 
           <div className="space-y-2 border-t pt-2 border-border">
-            <label className="text-sm font-medium">Certificate Image (Upload File to replace)</label>
-            <Input name="image_file" type="file" accept="image/*" className="cursor-pointer" />
+            <label htmlFor="edit-cert-image-file" className="text-sm font-medium">Certificate Image (Upload File to replace)</label>
+            <Input id="edit-cert-image-file" name="image_file" type="file" accept="image/*" className="cursor-pointer" />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Or Paste Image URL</label>
-            <Input name="image_url" defaultValue={cert.image_url || ""} />
+            <label htmlFor="edit-cert-image-url" className="text-sm font-medium">Or Paste Image URL</label>
+            <Input id="edit-cert-image-url" name="image_url" defaultValue={cert.image_url || ""} />
           </div>
 
           <div className="flex justify-end gap-2 pt-4 border-t border-border mt-4">

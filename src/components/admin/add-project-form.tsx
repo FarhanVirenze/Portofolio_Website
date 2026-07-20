@@ -34,39 +34,39 @@ export function AddProjectForm() {
       <CardContent>
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Project Title</label>
-            <Input name="title" placeholder="e.g. E-Commerce Platform" required />
+            <label htmlFor="project-title" className="text-sm font-medium">Project Title</label>
+            <Input id="project-title" name="title" placeholder="e.g. E-Commerce Platform" required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Description</label>
-            <Textarea name="description" placeholder="Short description about the project..." rows={3} className="resize-none" required />
+            <label htmlFor="project-description" className="text-sm font-medium">Description</label>
+            <Textarea id="project-description" name="description" placeholder="Short description about the project..." rows={3} className="resize-none" required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Tech Stack (comma separated)</label>
-            <Input name="tech_stack" placeholder="e.g. React, Node.js, PostgreSQL" required />
+            <label htmlFor="project-tech-stack" className="text-sm font-medium">Tech Stack (comma separated)</label>
+            <Input id="project-tech-stack" name="tech_stack" placeholder="e.g. React, Node.js, PostgreSQL" required />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">GitHub URL</label>
-              <Input name="github_url" placeholder="https://github.com/..." />
+              <label htmlFor="project-github-url" className="text-sm font-medium">GitHub URL</label>
+              <Input id="project-github-url" name="github_url" placeholder="https://github.com/..." />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Demo URL</label>
-              <Input name="demo_url" placeholder="https://..." />
+              <label htmlFor="project-demo-url" className="text-sm font-medium">Demo URL</label>
+              <Input id="project-demo-url" name="demo_url" placeholder="https://..." />
             </div>
           </div>
 
           <div className="space-y-2 border-t pt-2 border-border">
-            <label className="text-sm font-medium">Project Image</label>
-            <Input name="image_file" type="file" accept="image/*" className="cursor-pointer" />
+            <label htmlFor="project-image-file" className="text-sm font-medium">Project Image</label>
+            <Input id="project-image-file" name="image_file" type="file" accept="image/*" className="cursor-pointer" />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Or Paste Image URL</label>
-            <Input name="image_url" placeholder="https://..." />
+            <label htmlFor="project-image-url" className="text-sm font-medium">Or Paste Image URL</label>
+            <Input id="project-image-url" name="image_url" placeholder="https://..." />
           </div>
 
           <Button type="submit" className="w-full mt-2" disabled={isLoading}>

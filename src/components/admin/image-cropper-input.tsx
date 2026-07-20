@@ -120,6 +120,7 @@ export function ImageCropperInput({ existingImageUrl }: { existingImageUrl?: str
 
       <div className="flex-1 w-full space-y-3">
         <Input 
+          id="profile_image"
           name="profile_image" // We still name it so the original file gets sent just in case, but base64 takes precedence
           type="file" 
           accept="image/*" 
@@ -158,7 +159,7 @@ export function ImageCropperInput({ existingImageUrl }: { existingImageUrl?: str
                   min={1}
                   max={3}
                   step={0.1}
-                  aria-labelledby="Zoom"
+                  aria-label="Zoom"
                   onChange={(e) => {
                     setZoom(Number(e.target.value));
                   }}

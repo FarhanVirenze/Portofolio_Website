@@ -55,8 +55,9 @@ export default async function AdminAboutPage() {
                 <form action={updateAboutContent.bind(null, aboutContent.id)} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2 md:col-span-2">
-                      <label className="text-sm font-semibold">Biography Paragraphs</label>
+                      <label htmlFor="paragraphs" className="text-sm font-semibold">Biography Paragraphs</label>
                       <Textarea 
+                        id="paragraphs"
                         name="paragraphs" 
                         defaultValue={aboutContent.paragraphs?.join("\n\n") || ""} 
                         placeholder="Write your biography here. Separate paragraphs with a blank line (press Enter twice)." 
@@ -67,7 +68,7 @@ export default async function AdminAboutPage() {
                     </div>
 
                     <div className="space-y-3 md:col-span-2 border-t pt-4 border-border">
-                      <label className="text-sm font-semibold">Profile Photo</label>
+                      <label htmlFor="profile_image" className="text-sm font-semibold">Profile Photo</label>
                       <ImageCropperInput existingImageUrl={aboutContent.profile_image_url || undefined} />
                     </div>
                   </div>

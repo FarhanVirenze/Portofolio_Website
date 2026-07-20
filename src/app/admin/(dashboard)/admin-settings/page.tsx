@@ -70,7 +70,7 @@ export default function AdminSettingsPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Email Admin</label>
+              <label htmlFor="admin-email" className="text-sm font-medium">Email Admin</label>
               {isFetchingEmail ? (
                 <div className="flex items-center gap-2 h-10 px-3 bg-muted/50 rounded-xl">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -78,6 +78,7 @@ export default function AdminSettingsPage() {
                 </div>
               ) : (
                 <Input
+                  id="admin-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -88,9 +89,10 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Password Baru (plaintext)</label>
+              <label htmlFor="admin-password" className="text-sm font-medium">Password Baru (plaintext)</label>
               <div className="relative">
                 <Input
+                  id="admin-password"
                   type={showPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}

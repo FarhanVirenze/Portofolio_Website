@@ -37,39 +37,39 @@ export function EditProjectModal({ project }: { project: any }) {
           className="space-y-4 pt-4"
         >
           <div className="space-y-2">
-            <label className="text-sm font-medium">Project Title</label>
-            <Input name="title" defaultValue={project.title} required />
+            <label htmlFor="edit-project-title" className="text-sm font-medium">Project Title</label>
+            <Input id="edit-project-title" name="title" defaultValue={project.title} required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Description</label>
-            <Textarea name="description" defaultValue={project.description} rows={3} className="resize-none" required />
+            <label htmlFor="edit-project-description" className="text-sm font-medium">Description</label>
+            <Textarea id="edit-project-description" name="description" defaultValue={project.description} rows={3} className="resize-none" required />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Tech Stack (comma separated)</label>
-            <Input name="tech_stack" defaultValue={project.tech_stack?.join(", ") || ""} required />
+            <label htmlFor="edit-project-tech-stack" className="text-sm font-medium">Tech Stack (comma separated)</label>
+            <Input id="edit-project-tech-stack" name="tech_stack" defaultValue={project.tech_stack?.join(", ") || ""} required />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">GitHub URL</label>
-              <Input name="github_url" defaultValue={project.github_url || ""} />
+              <label htmlFor="edit-project-github-url" className="text-sm font-medium">GitHub URL</label>
+              <Input id="edit-project-github-url" name="github_url" defaultValue={project.github_url || ""} />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Live Demo URL</label>
-              <Input name="demo_url" defaultValue={project.demo_url || ""} />
+              <label htmlFor="edit-project-demo-url" className="text-sm font-medium">Live Demo URL</label>
+              <Input id="edit-project-demo-url" name="demo_url" defaultValue={project.demo_url || ""} />
             </div>
           </div>
 
           <div className="space-y-2 border-t pt-2 border-border">
-            <label className="text-sm font-medium">Project Image (Upload File to replace)</label>
-            <Input name="image_file" type="file" accept="image/*" className="cursor-pointer" />
+            <label htmlFor="edit-project-image-file" className="text-sm font-medium">Project Image (Upload File to replace)</label>
+            <Input id="edit-project-image-file" name="image_file" type="file" accept="image/*" className="cursor-pointer" />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Or Paste Image URL</label>
-            <Input name="image_url" defaultValue={project.image_url || ""} />
+            <label htmlFor="edit-project-image-url" className="text-sm font-medium">Or Paste Image URL</label>
+            <Input id="edit-project-image-url" name="image_url" defaultValue={project.image_url || ""} />
           </div>
 
           <div className="flex justify-end gap-2 pt-4 border-t border-border mt-4">
