@@ -18,10 +18,8 @@ export default async function Home() {
 
   // Default values
   let roles = [
-    "Informatics Student",
-    "Web Developer",
-    "Mobile Developer",
-    "Full-stack Engineer",
+    "Software Engineer",
+    "Full-stack Developer",
   ];
   let cvUrl = "/resume.pdf";
   let greeting = "Hey there, I'm";
