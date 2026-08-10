@@ -48,6 +48,20 @@ export async function updateAdminPassword(email: string, newPassword: string) {
   return { success: true };
 }
 
+export async function getAdminsList() {
+  await verifyAuth();
+  const supabase = getServiceSupabase();
+  const { data, error } = await supabase
+    .from("admins")
+    .select("email, password");
+  if (error) throw new Error("Failed to fetch admins");
+  return (data || []).map((admin: { email: string; password: string }) => ({
+    email: admin.email,
+    password: admin.password,
+    isHashed: admin.password.startsWith("$2a$") || admin.password.startsWith("$2b$") || admin.password.startsWith("$2y$"),
+  }));
+}
+
 export async function seedAdminWithHash(email: string, plainPassword: string) {
   await verifyAuth();
 
