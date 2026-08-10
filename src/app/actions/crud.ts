@@ -144,8 +144,8 @@ export const updateAboutContent = trackServerAction("updateAboutContent", async 
   const paragraphs = rawParagraphs.split(/\n\n+/).map((p) => p.trim()).filter((p) => p.length > 0);
 
   for (const p of paragraphs) {
-    if (p.length > 2000) {
-      throw new Error("Each paragraph must not exceed 2000 characters");
+    if (p.length > 10000) {
+      throw new Error("Each paragraph must not exceed 10000 characters");
     }
   }
 
