@@ -74,9 +74,9 @@ export function validateArray(value: unknown, fieldName: string): string[] {
 }
 
 export function validateImageFile(file: File): { valid: boolean; error?: string } {
-  const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp", "svg"];
-  const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp", "svg", "pdf"];
+  const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml", "application/pdf"];
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
   const ext = file.name.split(".").pop()?.toLowerCase();
   if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
