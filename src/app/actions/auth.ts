@@ -42,12 +42,7 @@ export async function loginAction(prevState: any, formData: FormData) {
       .single();
 
     if (data) {
-      const storedPassword = data.password;
-      if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$")) {
-        isValidUser = await bcrypt.compare(password, storedPassword);
-      } else {
-        isValidUser = password === storedPassword;
-      }
+      isValidUser = await bcrypt.compare(password, data.password);
     }
 
     if (isValidUser) {

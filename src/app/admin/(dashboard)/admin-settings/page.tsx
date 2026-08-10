@@ -4,8 +4,8 @@ import { useState, useEffect, type FormEvent } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Shield, Eye, EyeOff, CheckCircle, Users } from "lucide-react";
-import { updateAdminPassword, getAdminsList } from "@/app/actions/admin-auth";
+import { Loader2, Shield, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { updateAdminPassword } from "@/app/actions/admin-auth";
 import { showToast } from "@/components/toast";
 
 export default function AdminSettingsPage() {
@@ -15,8 +15,6 @@ export default function AdminSettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingEmail, setIsFetchingEmail] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
-  const [admins, setAdmins] = useState<{ email: string; password: string; isHashed: boolean }[]>([]);
-  const [isFetchingAdmins, setIsFetchingAdmins] = useState(true);
 
   useEffect(() => {
     async function fetchEmail() {
@@ -33,20 +31,6 @@ export default function AdminSettingsPage() {
       }
     }
     fetchEmail();
-  }, []);
-
-  useEffect(() => {
-    async function fetchAdmins() {
-      try {
-        const data = await getAdminsList();
-        setAdmins(data);
-      } catch {
-        setAdmins([]);
-      } finally {
-        setIsFetchingAdmins(false);
-      }
-    }
-    fetchAdmins();
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -162,61 +146,6 @@ export default function AdminSettingsPage() {
           <ul className="list-disc list-inside ml-2 space-y-1">
             <li>Password bcrypt hashed (recommended)</li>
           </ul>
-        </CardContent>
-      </Card>
-
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-primary" />
-            Daftar Admin & Password
-          </CardTitle>
-          <CardDescription>
-            Tabel berikut menampilkan semua akun admin beserta hashed password-nya.
-            Karena bcrypt adalah one-way hash, password asli tidak bisa dikembalikan dari hash.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isFetchingAdmins ? (
-            <div className="flex items-center gap-2 py-4">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-sm text-muted-foreground">Loading...</span>
-            </div>
-          ) : admins.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4">Tidak ada data admin ditemukan.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-2 px-3 font-medium">Email</th>
-                    <th className="text-left py-2 px-3 font-medium">Password</th>
-                    <th className="text-left py-2 px-3 font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {admins.map((admin) => (
-                    <tr key={admin.email} className="border-b border-border last:border-0">
-                      <td className="py-2 px-3 font-mono text-xs">{admin.email}</td>
-                      <td className="py-2 px-3 font-mono text-xs break-all text-muted-foreground">{admin.password}</td>
-                      <td className="py-2 px-3 text-xs">
-                        {admin.isHashed ? (
-                          <span className="text-amber-500 font-medium">Bcrypt Hash</span>
-                        ) : (
-                          <span className="text-emerald-500 font-medium">Plaintext</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <div className="mt-4 p-3 rounded-lg bg-muted/40 border border-border">
-            <p className="text-xs text-muted-foreground">
-              <strong>Referensi (.env.local):</strong> Email = <code>farhanvirenze18@gmail.com</code>, Password plaintext = <code>Tempayan18</code>
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
